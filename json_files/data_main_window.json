@@ -1,0 +1,77 @@
+{
+    "title_window": "My GUI",
+    "cancel_button": {
+        "position_x": 430,
+        "position_y": 430,
+        "width": 50,
+        "height": 50,
+        "name": "image_with_background",
+        "image": "images/cancel1.png",
+        "image2": "images/cancel2.png"
+    },
+    "title_label": {
+        "position_x": 100,
+        "position_y": 50,
+        "width": 300,
+        "height": 100,
+        "name": "image_with_background",
+        "image1": "images/spot.jpg"
+    },
+    "login_entry_box": {
+        "position_x": 80,
+        "position_y": 200,
+        "widthlabel": 100,
+        "widthentry": 100,
+        "height": 30,
+        "namelabel": "login_label",
+        "nameentry": "login_entry",
+        "text": "LOGIN",
+        "placeholder": "your login"
+    },
+    "password_entry_box": {
+        "position_x": 80,
+        "position_y": 250,
+        "widthlabel": 100,
+        "widthentry": 100,
+        "height": 30,
+        "namelabel": "password_label",
+        "nameentry": "password_entry",
+        "text": "PASSWORD",
+        "placeholder": "your password",
+        "password_style": true,
+        "see_button": true
+    },
+    "submit_button": {
+        "position_x": 330,
+        "position_y": 360,
+        "width": 100,
+        "height": 30,
+        "name": "submiter",
+        "text": "SUBMIT"
+    },
+    "remember_check_box": {
+        "position_x": 50,
+        "position_y": 300,
+        "width": 130,
+        "height": 25,
+        "name": "check_remember",
+        "text": "remember me"
+    },
+    "message_box_cancel_window": {
+        "title": "Cancel window..",
+        "text": "Are you sure to cancel to prevoius window?",
+        "name": "messagebox_green",
+        "icon": "images/spotifyimg.png"
+    },
+    "messagebox_green": {
+        "title": "Success",
+        "icon": "images/spotifyimg.png",
+        "text": "Logged in successfully",
+        "name": "messagebox_green"
+    },
+    "messagebox_red" :{
+        "title": "Failure",
+        "icon": "images/spotifyimg.png",
+        "name": "messagebox_red"
+    }
+}

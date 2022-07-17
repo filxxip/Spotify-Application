@@ -1,0 +1,92 @@
+{
+    "cancel_button": {
+        "position_x": 420,
+        "position_y": 430,
+        "width": 50,
+        "height": 50,
+        "name": "image_with_background",
+        "image": "images/cancel1.png",
+        "image2": "images/cancel2.png"
+    },
+    "message_box_cancel_window": {
+        "title": "Cancel window..",
+        "text": "Are you sure to cancel to prevoius window?",
+        "name": "messagebox_green",
+        "icon": "images/spotifyimg.png"
+    },
+    "entries_label_basic": {
+        "position_x": 40,
+        "widthlabel": 100,
+        "widthentry": 220,
+        "height": 30,
+        "namelabel": "new_account_login_label",
+        "nameentry": "new_account_login_entry"
+    },
+    "login": {
+        "position_y": 120,
+        "text": "LOGIN",
+        "placeholder": "your login"
+    },
+    "name": {
+        "position_y": 160,
+        "text": "NAME",
+        "placeholder": "your name"
+    },
+    "surname": {
+        "position_y": 200,
+        "text": "SURNAME",
+        "placeholder": "your surname"
+    },
+    "age": {
+        "position_y": 240,
+        "text": "AGE",
+        "placeholder": "your age"
+    },
+    "country": {
+        "position_y": 280,
+        "text": "COUNTRY",
+        "placeholder": "your country"
+    },
+    "nationality": {
+        "position_y": 320,
+        "text": "NATIONALITY",
+        "placeholder": "your nationality"
+    },
+    "gender": {
+        "position_y": 360,
+        "text": "GENDER",
+        "placeholder": "your gender"
+    },
+    "password": {
+        "position_y": 400,
+        "text": "PASSWORD",
+        "placeholder": "your password"
+    },
+    "repeat": {
+        "position_y": 440,
+        "text": "REPEAT",
+        "placeholder": "your repeated password"
+    },
+    "title_label": {
+        "position_x": 85,
+        "position_y": 10,
+        "width": 330,
+        "height": 100,
+        "name": "image_with_background",
+        "image1": "images/spotify2.png"
+    },
+    "submit_button":{
+        "position_x": 400,
+        "position_y": 380,
+        "width": 90,
+        "height": 40,
+        "name": "submiter",
+        "text":"SUBMIT"
+    },
+    "messagebox_new_account" :{
+        "title": "Well Done!",
+        "text":"Congratulation, you have created new account",
+        "icon": "images/spotifyimg.png",
+        "name": "messagebox_green"
+    }
+}

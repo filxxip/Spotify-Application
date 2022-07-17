@@ -1,0 +1,186 @@
+
+/* submit button */
+QPushButton#submiter,QPushButton#see_password {
+    background-color: rgb(91, 150, 77);
+    font: Helvetica;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+
+QPushButton#submiter:hover,QPushButton#see_password:hover{
+    background-color: rgb(73, 219, 36);
+}
+/* main window background */
+QDialog {
+    background-color: rgb(101, 237, 247);
+    border: 0px;
+}
+#image_with_background {
+    background-color: rgb(101, 237, 247);
+    border: 0px;
+}
+/* Label and entry for logging */
+QLabel#password_label, QLabel#login_label, QLabel#checkbox_label {
+    background-color: rgb(219, 75, 75);
+    font: Helvetica;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+
+QLabel#login_label:hover, QLabel#password_label:hover, QLabel#checkbox_label:hover{
+    background-color: rgba(245, 47, 47, 0.952);
+}
+
+QLineEdit#incorrect_login_entry,QLineEdit#incorrect_password_entry {
+    background-color: rgba(245, 47, 47, 0.952);
+    font: Helvetica;
+    padding-left: 5px;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+
+QLineEdit#incorrect_login_entry:focus,QLineEdit#incorrect_password_entry:focus {
+    background-color: rgb(143, 6, 1);
+    border: 2px solid rgb(250, 158, 21);
+}
+
+QLineEdit#incorrect_login_entry:hover,QLineEdit#incorrect_password_entry:hover {
+    background-color: rgb(143, 6, 1);;
+}
+
+QLineEdit#correct_login_entry,QLineEdit#correct_password_entry {
+    background-color: rgb(91, 150, 77);
+    font: Helvetica;
+    padding-left: 5px;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+
+QLineEdit#correct_login_entry:focus,QLineEdit#correct_password_entry:focus {
+    background-color: rgb(43, 87, 32);
+    border: 2px solid rgb(250, 158, 21);
+}
+
+QLineEdit#correct_login_entry:hover,QLineEdit#correct_password_entry:hover {
+    background-color: rgb(43, 87, 32);;
+}
+
+QLineEdit#login_entry,QLineEdit#password_entry {
+    background-color: rgb(118, 91, 143);
+    font: Helvetica;
+    padding-left: 5px;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+QLineEdit#login_entry:hover,QLineEdit#password_entry:hover {
+    background-color: rgb(131, 25, 230);
+}
+QLineEdit#login_entry:focus,QLineEdit#password_entry:focus {
+    background-color: rgb(131, 25, 230);
+    border: 2px solid rgb(250, 158, 21);
+}
+QLineEdit#no_password {
+    background-color: rgb(117, 163, 201);
+    font: Helvetica;
+    padding-left: 5px;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+    
+}
+
+/* Message box appearance */
+QMessageBox{
+    background-color: rgb(101, 237, 247);
+    border: 0px, solid;
+    font-size: 20px;
+}
+QMessageBox QLabel{
+    background-color: rgb(101, 237, 247);
+    padding:3px;
+    font-size: 18px;
+    border-radius: 5px;
+}
+QMessageBox QAbstractButton{
+    background-color: rgb(101, 237, 247);
+    padding:3px;
+    font-size: 15px;
+    border-radius: 5px;
+    
+}
+QMessageBox QAbstractButton:hover{
+    font-size: 15px;
+    
+}
+QMessageBox#messagebox_green QLabel{
+    border: 3px solid #1ed760;
+}
+QMessageBox#messagebox_green QAbstractButton{
+    border: 3px solid #1ed760;
+    
+}
+QMessageBox#messagebox_green QAbstractButton:hover{
+    background-color: rgb(231, 69, 96);
+}
+QMessageBox#messagebox_red QLabel{
+    border: 3px solid rgb(231, 69, 96);
+}
+QMessageBox#messagebox_red QAbstractButton{
+    border: 3px solid rgb(231, 69, 96);
+    
+}
+QMessageBox#messagebox_red QAbstractButton:hover{
+    background-color: #1ed760;
+}
+/* CHeckbox database */
+QCheckBox#check_remember{
+    padding-left: 3px;
+    background-color: rgb(219, 75, 75);
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+QCheckBox:hover#check_remember{
+    padding-left: 3px;
+    background-color: rgba(245, 47, 47, 0.952);
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+
+/* new account labels and entries */
+QLabel#new_account_login_label {
+    background-color: rgb(219, 75, 75);
+    font: Helvetica;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+
+QLabel#new_account_login_label:hover{
+    background-color: rgba(245, 47, 47, 0.952);
+}
+QLineEdit#new_account_login_entry{
+    background-color: rgb(118, 91, 143);
+    font: Helvetica;
+    padding-left: 5px;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+QLineEdit#new_account_login_entry_incorrect{
+    background-color: rgb(247, 15, 15);
+    font: Helvetica;
+    padding-left: 5px;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+QLineEdit#new_account_login_entry_correct{
+    background-color: rgb(63, 240, 18);
+    font: Helvetica;
+    padding-left: 5px;
+    border: 2px solid rgb(79, 79, 218);
+    border-radius: 5px;
+}
+QLineEdit#new_account_login_entry:hover{
+    background-color: rgb(131, 25, 230);
+}
+QLineEdit#new_account_login_entry:focus{
+    background-color: rgb(131, 25, 230);
+    border: 2px solid rgb(250, 158, 21);
+}

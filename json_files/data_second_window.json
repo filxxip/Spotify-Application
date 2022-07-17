@@ -1,0 +1,57 @@
+{
+    "title_label": {
+        "position_x": 100,
+        "position_y": 50,
+        "width": 300,
+        "height": 100,
+        "name": "image_with_background",
+        "image1": "images/spot.jpg"
+    },
+    "cancel_button": {
+        "position_x": 430,
+        "position_y": 430,
+        "width": 50,
+        "height": 50,
+        "name": "image_with_background",
+        "image": "images/cancel1.png",
+        "image2": "images/cancel2.png"
+    },
+    "login_label": {
+        "position_x": 90,
+        "position_y": 200,
+        "width": 120,
+        "height": 30,
+        "name": "login_label",
+        "text": "LOGIN"
+    },
+    "password_label": {
+        "position_x": 290,
+        "position_y": 200,
+        "width": 120,
+        "height": 30,
+        "name": "login_label",
+        "text": "NEW ACCOUNT"
+    },
+    "login_button": {
+        "position_x": 100,
+        "position_y": 270,
+        "width": 100,
+        "height": 100,
+        "name": "image_with_background",
+        "image": "images/login_window.png"
+    },
+    "password_button": {
+        "position_x": 300,
+        "position_y": 270,
+        "width": 100,
+        "height": 100,
+        "name": "image_with_background",
+        "image": "images/new_user.png"
+    },
+    "exit_button": {
+        "title": "Exit window..",
+        "text": "Are you sure to exit this window?",
+        "name": "messagebox_red",
+        "icon":"images/spotifyimg.png"
+    }
+}
