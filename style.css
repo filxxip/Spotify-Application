@@ -11,10 +11,38 @@ QPushButton#submiter:hover,QPushButton#see_password:hover{
     background-color: rgb(73, 219, 36);
 }
 /* main window background */
-QDialog {
+/* QDialog {
     background-color: rgb(101, 237, 247);
     border: 0px;
+} */
+/* QWidget#tabwidget {
+    background-color: rgb(101, 237, 247);
+    border: 0px;
+} */
+QTabWidget::pane{
+    background-color: rgb(101, 237, 247);
+    border: 1px;
 }
+QDialog{
+    background-color: rgb(101, 237, 247);
+    border: 1px;
+}
+/* QTabWidget QTabBar{
+    background-color: rgb(91, 150, 77);
+    width: 50px;
+
+} */
+QTabWidget::tab-bar{
+    left: 10px;
+
+}
+/* QTabBar::tab:last{
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+} */
+/* QTabBar::tab:selected{
+    background-color: rgba(245, 47, 47, 0.952);
+} */
 #image_with_background {
     background-color: rgb(101, 237, 247);
     border: 0px;
@@ -183,4 +211,8 @@ QLineEdit#new_account_login_entry:hover{
 QLineEdit#new_account_login_entry:focus{
     background-color: rgb(131, 25, 230);
     border: 2px solid rgb(250, 158, 21);
+}
+
+QVideoWidget#wideowidget, QMediaPlayer#wideowidget{
+    border: 2px solid #1ed760;
 }

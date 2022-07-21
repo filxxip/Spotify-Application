@@ -11,6 +11,11 @@ import json
 from enum import Enum
 
 
+class Widget_index(Enum):
+    MAIN: 0
+    SECOND: 1
+
+
 class MyError(Exception):
     def __init__(self, text):
 
@@ -146,7 +151,7 @@ class MyButton:
     ):
         self.name = name
         self.button = QPushButton(master)
-        #self.button.
+        # self.button.
         self.button.setCursor(QCursor(Qt.PointingHandCursor))
         self.button.setGeometry(position_x, position_y, width, height)
         self.button.setObjectName(name)
@@ -158,7 +163,7 @@ class MyButton:
             self.function_pressed = function_pressed
         if function_released:
             self.button.released.connect(function_released)
-            self.function_released  = function_released
+            self.function_released = function_released
 
     def change_function_clicked(self, new_func):
         self.button.clicked.connect(new_func)
@@ -224,7 +229,6 @@ class MyButtonwithImage(MyButton):
             name2,
         )
         self.setting_images(master, width, height, image, image2, name2)
-        
 
     def setting_images(self, master, width, height, image, image2, name2):
         if image:
@@ -441,7 +445,7 @@ class Label_Entry_Box_Password(Label_Entry_Box):
     def check(
         self,
     ) -> bool:
-        return any(ele.isupper() for ele in self.__str__()) # checking data
+        return any(ele.isupper() for ele in self.__str__())  # checking data
 
 
 class Label_Entry_Box_Gender(Label_Entry_Box):

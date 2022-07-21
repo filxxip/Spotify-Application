@@ -1,0 +1,17 @@
+{
+    "message_box_cancel_window": {
+        "title": "Logout",
+        "text": "Are you sure to cancel to logout?",
+        "name": "messagebox_green",
+        "icon": "images/spotifyimg.png"
+    },
+    "cancel_button": {
+        "position_x": 730,
+        "position_y": 700,
+        "width": 50,
+        "height": 50,
+        "name": "image_with_background",
+        "image": "images/cancel1.png",
+        "image2": "images/cancel2.png"
+    }
+}
