@@ -1,13 +1,14 @@
 from singleton import Singleton
-from PyQt5.QtWidgets import QStackedWidget
-
-
+from PyQt5.QtWidgets import QStackedWidget, QMainWindow
+from PyQt5 import QtCore
 class BaseForAll(metaclass=Singleton):
     def __init__(self, master, title, styling, starting_window):
         self.master = master
         master.setStyleSheet(open(styling).read())
         self.windows = {}
-        self.widget = QStackedWidget()
+        self.widget = QMainWindow(None, QtCore.Qt.WindowStaysOnTopHint)
+        self.x = QStackedWidget(self.widget)
+
         self.widget.setWindowTitle(title)
         self._height = 0
         self._width = 0
@@ -25,6 +26,14 @@ class BaseForAll(metaclass=Singleton):
             self.widget.setMinimumWidth(minimum_width)
         if maximum_width:
             self.widget.setMaximumWidth(maximum_width)
+        if minimum_height:
+            self.x.setMinimumHeight(minimum_height)
+        if maximum_height:
+            self.x.setMaximumHeight(maximum_height)
+        if minimum_width:
+            self.x.setMinimumWidth(minimum_width)
+        if maximum_width:
+            self.x.setMaximumWidth(maximum_width)
 
     @property
     def width(self):
@@ -38,28 +47,31 @@ class BaseForAll(metaclass=Singleton):
     def width(self, new_value):
         self._width = new_value
         self.widget.setFixedWidth(new_value)
+        self.x.setFixedWidth(new_value)
 
     @height.setter
     def height(self, new_value):
         self._height = new_value
         self.widget.setFixedHeight(new_value)
+        self.x.setFixedHeight(new_value)
 
     def add_widget(self, new_widget):
         if self.windows.get(new_widget.__name__):
-            self.widget.removeWidget(self.windows[new_widget.__name__])
+            self.x.removeWidget(self.windows[new_widget.__name__])
             del self.windows[new_widget.__name__]
         w = new_widget(self)
         self.windows[new_widget.__name__] = w.window
-        self.widget.addWidget(w.window)
+        self.x.addWidget(w.window)
 
     def set_widget(self, widget):
         name = widget.__name__
         self.set_dimentions(*widget.dimensions)
-        self.widget.setCurrentWidget(self.windows.get(name))
+        self.x.setCurrentWidget(self.windows.get(name))
 
     def add_and_set(self, new_widget):
         self.add_widget(new_widget)
         self.set_widget(new_widget)
 
     def show(self):
+        self.x.show()
         self.widget.show()

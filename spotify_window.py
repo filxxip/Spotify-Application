@@ -13,9 +13,9 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QAction,
     QLineEdit,
-    QShortcut,
+    QShortcut,QMainWindow
 )
-from moviepy.editor import VideoFileClip
+# from moviepy.editor import VideoFileClip
 import pyautogui
 import json
 from PyQt5.QtMultimedia import (
@@ -36,8 +36,9 @@ import os
 class MyTab:
     def __init__(self, master, window, title):
         self.master: BaseForAll = master
-        self.window = window
-        self.tab = QWidget()
+        self.window:QTabWidget = window
+        
+        self.tab = QDialog()
         self.tab.setObjectName("tabwidget")
         self.window.addTab(self.tab, title)
 
@@ -45,6 +46,14 @@ class MyTab:
     def tabbar(self):
         return self.window.tabBar()
 
+
+class PanelWithSongs:
+    def __init__(self, master):
+        files = os.listdir('/home/filip/Documents/qt-learning/songs')
+        print(files)
+        label = QLabel(master.tab)
+        label.setText("jakis")
+        label.setGeometry(100, 600, 20, 20)
 
 class FirstTab(MyTab):
     marg = (50, 20, 50, 400)
@@ -80,9 +89,9 @@ class FirstTab(MyTab):
         self.master.widget.setWindowFlags(
             self.master.widget.windowFlags() & ~Qt.FramelessWindowHint
         )
-        self.master.widget.setWindowFlags(
-            self.master.widget.windowFlags() & ~Qt.WindowStaysOnTopHint
-        )
+        # self.master.widget.setWindowFlags(
+        #     self.master.widget.windowFlags() & ~Qt.WindowStaysOnTopHint
+        # )
         self.master.widget.show()
         self.tabbar.show()
         self.status_play_bar(True)
@@ -96,6 +105,12 @@ class FirstTab(MyTab):
         self.layout.setContentsMargins(*FirstTab.marg)
         self.tab.mouseMoveEvent = lambda event: None
         self.tab.setMouseTracking(False)
+        PanelWithSongs(self)
+        but = QPushButton(self.tab)
+        but.setGeometry(200, 400, 10, 50)
+        # but.clicked.connect(lambda : self.master.widget.setWindowFlag(Qt.WindowStaysOnTopHint))
+        self.tab.setWindowFlag(Qt.WindowStaysOnTopHint)
+
 
     def creation_of_mediaplayer(self):
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
@@ -150,10 +165,9 @@ class FirstTab(MyTab):
         self.start_time_lbl = QLabel("00:00:00")
         self.end_time_lbl = QLabel("00:00:00")
         self.creating_layout(*FirstTab.marg)
+        
         # self.layout.setContentsMargins(*FirstTab.marg)
     def open_file(self):
-        files = os.listdir('/home/filip/Documents/qt-learning/songs')
-        print(files)
         filename, _ = QFileDialog.getOpenFileName(self.tab, "Open Movie", QDir.homePath() + "/filip/Documents/qt-learning")
         if filename!="":
             self.open_movie(filename)
@@ -178,13 +192,16 @@ class FirstTab(MyTab):
         self.videoWidget.mousePressEvent = lambda event: self.func1(event)
         self.videoWidget.mouseReleaseEvent = lambda event: self.func2(event)
         x, y = pyautogui.position()
-        vid = cv2.VideoCapture(self.video_name)
+        vid = cv2.VideoCapture(self.video_name) 
         height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
         width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
         self.tabbar.hide()
-        self.master.widget.setWindowFlags(
-            Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-        )
+        self.master.widget.setWindowFlags(Qt.FramelessWindowHint |
+            Qt.WindowStaysOnTopHint)
+        self.tab.setWindowFlags(Qt.FramelessWindowHint |
+            Qt.WindowStaysOnTopHint)
+        print("on top")
+        # self.master.widget.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint | Qt.WindowStaysOnTopHint)
         self.master.widget.show()
         self.status_play_bar(False)
         self.master.set_dimentions(round(width / 5), round(height / 5))
