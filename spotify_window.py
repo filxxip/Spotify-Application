@@ -13,8 +13,9 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QAction,
     QLineEdit,
-    QShortcut
+    QShortcut,
 )
+from moviepy.editor import VideoFileClip
 import pyautogui
 import json
 from PyQt5.QtMultimedia import (
@@ -26,9 +27,10 @@ from PyQt5.QtMultimedia import (
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from base_component import BaseForAll
 from components import MyButtonwithImage, MyLabel, MyMsgBox, Mybuttonwithtext
-from PyQt5.QtCore import Qt, QUrl, QTime, QPoint, QSize
+from PyQt5.QtCore import Qt, QUrl, QTime, QPoint, QSize, QDir
 from PyQt5.QtGui import QIcon, QKeySequence, QCursor
 import cv2
+import os
 
 
 class MyTab:
@@ -42,7 +44,6 @@ class MyTab:
     @property
     def tabbar(self):
         return self.window.tabBar()
-
 
 
 class FirstTab(MyTab):
@@ -64,53 +65,17 @@ class FirstTab(MyTab):
         self.clickable_button = QPushButton(self.tab)
         self.clickable_button.setText("kliknij")
         self.clickable_button.clicked.connect(
-            lambda: self.open_movie(
-                "/home/filip/Documents/qt-learning/Coldplay X Selena Gomez - Let Somebody Go (Official Video).mp4"
+            lambda: self.open_file(
+                # "/home/filip/Documents/qt-learning/Coldplay X Selena Gomez - Let Somebody Go (Official Video).mp4"
             )
         )
-        # self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
-        # self.videoWidget = QVideoWidget()
-        # self.open_movie(
-        #     "/home/filip/Documents/qt-learning/Coldplay X Selena Gomez - Let Somebody Go (Official Video).mp4"
-        # )
-
-        # self.size_button = MyButtonwithImage(self.tab, **data["small_size"], function_clicked=lambda: self.change_size2())
-        # self.size_button.button.setMaximumSize(20, 20)
-        # self.size_button.setMaximumSize(22, 22)
-        # self.size_button.setIconSize(QSize(30, 30))
-        # self.size_button.setIcon(QIcon("images/size_image2"))
         self.creation_of_mediaplayer()
         self.creation_of_layout()
-        # self.tab.mouseDoubleClickEvent = lambda event: None
-        # self.playbutton = QPushButton()
-        # self.playbutton.setIcon(self.tab.style().standardIcon(QStyle.SP_MediaPlay))
-        # self.playbutton.clicked.connect(self.play)
-        # self.soundbutton = QPushButton()
-        # self.soundbutton.setIcon(self.tab.style().standardIcon(QStyle.SP_MediaVolume))
-        # self.soundbutton.clicked.connect(self.change_sound)
-
-        # self.slider = QSlider(Qt.Horizontal)
-        # self.slider.sliderMoved.connect(self.setPosition)
-        # self.slider.setCursor(QCursor(Qt.UpArrowCursor))
-
-        # self.slider_sound = QSlider(Qt.Horizontal)
-        # self.slider_sound.sliderMoved.connect(self.setSound)
-
-        # self.slider_sound.setSliderPosition(50)
-        # self.mediaPlayer.setVolume(50)
-
-        # self.start_time_lbl = QLabel("00:00:00")
-        # self.end_time_lbl = QLabel("00:00:00")
-        # self.mediaPlayer.setVideoOutput(self.videoWidget)
-        # self.mediaPlayer.stateChanged.connect(self.media_state_change)
-        # self.mediaPlayer.positionChanged.connect(self.slider_position_change)
-        # self.mediaPlayer.durationChanged.connect(self.slider_duration_change)
-        # self.mediaPlayer.volumeChanged.connect(self.setSound)
-        # self.creating_layout(*FirstTab.marg)
         self.creating_short_cuts()
         self.size_button.button.click()
         self.videoWidget.mousePressEvent = lambda event: None
         self.videoWidget.mouseReleaseEvent = lambda event: None
+        self.videoWidget.mouseDoubleClickEvent = lambda event : self.change_size2(event)
         x, y = pyautogui.position()
         self.master.widget.setWindowFlags(
             self.master.widget.windowFlags() & ~Qt.FramelessWindowHint
@@ -131,23 +96,39 @@ class FirstTab(MyTab):
         self.layout.setContentsMargins(*FirstTab.marg)
         self.tab.mouseMoveEvent = lambda event: None
         self.tab.setMouseTracking(False)
-        # self.videoWidget.mouseDoubleClickEvent = lambda event: None
 
     def creation_of_mediaplayer(self):
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
         self.videoWidget = QVideoWidget()
+        # mp4 = "/home/filip/Documents/qt-learning/songs/Coldplay - Biutyful (Official Video).mp4"
+        # mp3 = "/home/filip/Documents/qt-learning/songs/Coldplay - Biutyful (Official Video).mp3"
+        # videoclip =  VideoFileClip(mp4)
+        # audioclip = videoclip.audio
+        # audioclip.write_audiofile(mp3)
+        # audioclip.close()
+        # videoclip.close()
+        # self.video_name = '/home/filip/Documents/qt-learning/songs/Coldplay - Biutyful (Official Video).mp3'
+        # media = QMediaContent(QUrl.fromLocalFile('/home/filip/Documents/qt-learning/songs/Coldplay - Biutyful (Official Video).mp3'))
+        # self.mediaPlayer.setMedia(media)
+        # self.videoWidget.addMedia(QMediaContent(QUrl('/home/filip/Documents/qt-learning/songs/Coldplay - Biutyful (Official Video).mp3')))
+
+        
+        self.videoWidget = QVideoWidget()
         self.open_movie(
-            "/home/filip/Documents/qt-learning/Coldplay X Selena Gomez - Let Somebody Go (Official Video).mp4"
+            "/home/filip/Documents/qt-learning/songs/Coldplay X Selena Gomez - Let Somebody Go (Official Video).mp4"
         )
         self.mediaPlayer.setVideoOutput(self.videoWidget)
         self.mediaPlayer.stateChanged.connect(self.media_state_change)
         self.mediaPlayer.positionChanged.connect(self.slider_position_change)
         self.mediaPlayer.durationChanged.connect(self.slider_duration_change)
         self.mediaPlayer.volumeChanged.connect(self.setSound)
+
     def creation_of_layout(self):
         with open("json_files/data_spotify_window.json") as data:
             data = json.load(data)
-        self.size_button = MyButtonwithImage(self.tab, **data["small_size"], function_clicked=lambda: self.change_size2())
+        self.size_button = MyButtonwithImage(
+            self.tab, **data["small_size"], function_clicked=lambda: self.change_size2()
+        )
         self.size_button.button.setMaximumSize(20, 20)
         self.playbutton = QPushButton()
         self.playbutton.setIcon(self.tab.style().standardIcon(QStyle.SP_MediaPlay))
@@ -170,6 +151,12 @@ class FirstTab(MyTab):
         self.end_time_lbl = QLabel("00:00:00")
         self.creating_layout(*FirstTab.marg)
         # self.layout.setContentsMargins(*FirstTab.marg)
+    def open_file(self):
+        files = os.listdir('/home/filip/Documents/qt-learning/songs')
+        print(files)
+        filename, _ = QFileDialog.getOpenFileName(self.tab, "Open Movie", QDir.homePath() + "/filip/Documents/qt-learning")
+        if filename!="":
+            self.open_movie(filename)
     def func1(self, event):
         self.tab.mouseMoveEvent = lambda event: self.moving_window(event)
 
@@ -187,7 +174,7 @@ class FirstTab(MyTab):
             self.master.height,
         )
 
-    def change_size2(self):
+    def change_size2(self, event = None):
         self.videoWidget.mousePressEvent = lambda event: self.func1(event)
         self.videoWidget.mouseReleaseEvent = lambda event: self.func2(event)
         x, y = pyautogui.position()
@@ -201,13 +188,20 @@ class FirstTab(MyTab):
         self.master.widget.show()
         self.status_play_bar(False)
         self.master.set_dimentions(round(width / 5), round(height / 5))
-        self.master.widget.setGeometry(
-            x - int(self.videoWidget.width() / 2) - 3 * int(self.master.width / 2),
-            y - int(self.videoWidget.height() / 2) - 3 * int(self.master.height / 2),
-            self.master.width,
-            self.master.height,
-        )
-
+        if not event:
+            self.master.widget.setGeometry(
+                x - int(self.videoWidget.width() / 2) - 3 * int(self.master.width / 2),
+                y - int(self.videoWidget.height() / 2) - 3 * int(self.master.height / 2),
+                self.master.width,
+                self.master.height,
+            )
+        if event:
+            self.master.widget.setGeometry(
+                    x - int(width / 10),
+                    y - int(height / 10),
+                    self.master.width,
+                    self.master.height,
+                )
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.tab.setMouseTracking(True)
         self.tab.mouseMoveEvent = lambda event: self.moving_window(event)
@@ -236,7 +230,8 @@ class FirstTab(MyTab):
         self.layout.setContentsMargins(*FirstTab.marg)
         self.tab.mouseMoveEvent = lambda event: None
         self.tab.setMouseTracking(False)
-        self.videoWidget.mouseDoubleClickEvent = lambda event: None
+        # self.videoWidget.mouseDoubleClickEvent = lambda event: None
+        self.videoWidget.mouseDoubleClickEvent = lambda event : self.change_size2(event)
 
     @property
     def layout(self):
@@ -349,20 +344,20 @@ class FirstTab(MyTab):
                 self.tab.style().standardIcon(QStyle.SP_MediaVolume)
             )
 
-    def exit_func(self, event = None, next_window = False):
+    def exit_func(self, event=None, next_window=False):
         from open_window import OpenWindow
+
         if self.__dict__.get("mediaPlayer"):
             self.mediaPlayer.stop()
             del self.mediaPlayer
         if next_window:
             self.master.set_widget(OpenWindow)
             del self.master.windows["SpotifyWindow"]
-        
 
     def func_for_exit(self, data):
         MyMsgBox(
             **data,
-            Yeah=[QMessageBox.YesRole, lambda : self.exit_func(next_window=True)],
+            Yeah=[QMessageBox.YesRole, lambda: self.exit_func(next_window=True)],
             Nope=[QMessageBox.NoRole, lambda: None],
         )
 
