@@ -13,5 +13,13 @@
         "name": "image_with_background",
         "image": "images/cancel1.png",
         "image2": "images/cancel2.png"
+    },
+    "small_size":{
+        "position_x": 0,
+        "position_y": 0,
+        "width": 25,
+        "height": 25,
+        "name": "small_size",
+        "image": "images/size_image.png"
     }
 }

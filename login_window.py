@@ -27,7 +27,6 @@ class LoginWindow:
         self.master = master
         self.window = QDialog()
         self.window.eventFilter = self.eventFilter
-        self.window.setGeometry(100, 100, 500, 500)
         with open("json_files/data_main_window.json") as data:
             data = json.load(data)
         self.window.setWindowTitle(data["title_window"])
@@ -51,7 +50,6 @@ class LoginWindow:
         )
         self.checkbox = MyCheckBox(self.window, **data["remember_check_box"])
         self.entry_setter()
-        self.window.show()
 
     def entry_setter(self):
         with open("json_files/data.json") as file:

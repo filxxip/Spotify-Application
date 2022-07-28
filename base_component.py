@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QStackedWidget
 class BaseForAll(metaclass=Singleton):
     def __init__(self, master, title, styling, starting_window):
         self.master = master
-        print("cos tam")
         master.setStyleSheet(open(styling).read())
         self.windows = {}
         self.widget = QStackedWidget()
@@ -47,7 +46,6 @@ class BaseForAll(metaclass=Singleton):
 
     def add_widget(self, new_widget):
         if self.windows.get(new_widget.__name__):
-            print("xxx")
             self.widget.removeWidget(self.windows[new_widget.__name__])
             del self.windows[new_widget.__name__]
         w = new_widget(self)
@@ -55,14 +53,11 @@ class BaseForAll(metaclass=Singleton):
         self.widget.addWidget(w.window)
 
     def set_widget(self, widget):
-        print(self.windows)
         name = widget.__name__
         self.set_dimentions(*widget.dimensions)
         self.widget.setCurrentWidget(self.windows.get(name))
-        print(self.widget.currentWidget().windowTitle())
 
     def add_and_set(self, new_widget):
-        print(new_widget)
         self.add_widget(new_widget)
         self.set_widget(new_widget)
 

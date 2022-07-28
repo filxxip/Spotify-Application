@@ -216,3 +216,84 @@ QLineEdit#new_account_login_entry:focus{
 QVideoWidget#wideowidget, QMediaPlayer#wideowidget{
     border: 2px solid #1ed760;
 }
+
+/* Panel */
+QStackedWidget {
+    background-color: rgb(101, 237, 247);
+    border: 0px, solid
+}
+
+
+QTabWidget {
+    background-color: rgb(91, 150, 77);
+    border: 0px, solid
+}
+
+QTabBar {
+    background-color: rgb(91, 150, 77);
+    font: 10pt "Arial";
+    margin-left: 22px;
+    margin-right: 22px;
+    border-bottom: 4px solid #bd1b1b;
+}
+
+QTabWidget::tab-bar {
+    alignment: center;
+    border-color: rgb(91, 150, 77);
+}
+
+
+QTabBar::tab {
+    background-color: rgb(91, 150, 77);
+    border-bottom: 4px solid #bd1b1b;
+    height: 40px;
+    color: white;
+    font-size: 18px;
+    width: 100px;
+}
+
+QTabBar::tab:first {
+    border-left: 4px solid #bd1b1b;
+    border-bottom-left-radius: 6px;
+    margin-left: 5px;
+}
+
+QTabBar::tab:last {
+    border-right: 4px solid #bd1b1b;
+    border-bottom-right-radius: 6px;
+    margin-right: 5px;
+}
+
+QTabBar::tab:selected {
+    background-color: rgb(24, 104, 5);
+    border-bottom: 4px solid rgb(79, 79, 218);
+    border-right: 4px solid rgb(79, 79, 218);
+    border-left: 4px solid rgb(79, 79, 218);
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+QTabBar::tab:hover {
+    background-color: rgb(24, 104, 5);
+    border-bottom: 4px solid rgb(248, 134, 4);
+}
+
+QTabBar::tab:hover:last {
+    border-right: 4px solid rgb(248, 134, 4);
+}
+
+QTabBar::tab:hover:first {
+    border-left: 4px solid rgb(248, 134, 4);
+}
+
+QTabBar::tab:hover:selected {
+    border-bottom: 4px solid rgb(79, 79, 218);
+    border-right: 4px solid rgb(79, 79, 218);
+    border-left: 4px solid rgb(79, 79, 218);
+}
+
+QTabBar::tab:hover:selected {
+    border-bottom: 4px solid rgb(79, 79, 218);
+    border-right: 4px solid rgb(79, 79, 218);
+    border-left: 4px solid rgb(79, 79, 218);
+}
