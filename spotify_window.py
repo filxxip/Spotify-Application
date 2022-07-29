@@ -22,12 +22,12 @@ from PyQt5.QtMultimedia import (
     QMediaContent,
     QMediaPlayer,
     QMediaMetaData,
-    QMediaPlaylist,
+    QMediaPlaylist
 )
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from base_component import BaseForAll
 from components import MyButtonwithImage, MyLabel, MyMsgBox, Mybuttonwithtext
-from PyQt5.QtCore import Qt, QUrl, QTime, QPoint, QSize, QDir
+from PyQt5.QtCore import Qt, QUrl, QTime, QPoint, QSize, QDir, QTimer
 from PyQt5.QtGui import QIcon, QKeySequence, QCursor
 import cv2
 import os
@@ -37,7 +37,6 @@ class MyTab:
     def __init__(self, master, window, title):
         self.master: BaseForAll = master
         self.window:QTabWidget = window
-        
         self.tab = QDialog()
         self.tab.setObjectName("tabwidget")
         self.window.addTab(self.tab, title)
@@ -75,43 +74,43 @@ class FirstTab(MyTab):
         self.clickable_button.setText("kliknij")
         self.clickable_button.clicked.connect(
             lambda: self.open_file(
-                # "/home/filip/Documents/qt-learning/Coldplay X Selena Gomez - Let Somebody Go (Official Video).mp4"
             )
         )
         self.creation_of_mediaplayer()
         self.creation_of_layout()
         self.creating_short_cuts()
-        self.size_button.button.click()
-        self.videoWidget.mousePressEvent = lambda event: None
-        self.videoWidget.mouseReleaseEvent = lambda event: None
-        self.videoWidget.mouseDoubleClickEvent = lambda event : self.change_size2(event)
-        x, y = pyautogui.position()
-        self.master.widget.setWindowFlags(
-            self.master.widget.windowFlags() & ~Qt.FramelessWindowHint
-        )
+        QTimer.singleShot(1, self.change_size2)
+        QTimer.singleShot(1, self.change_size)
+        # self.size_button.button.click()
+        # self.videoWidget.mousePressEvent = lambda event: None
+        # self.videoWidget.mouseReleaseEvent = lambda event: None
+        # self.videoWidget.mouseDoubleClickEvent = lambda event : self.change_size2(event)
+        # # x, y = pyautogui.position()
         # self.master.widget.setWindowFlags(
-        #     self.master.widget.windowFlags() & ~Qt.WindowStaysOnTopHint
+        #     self.master.widget.windowFlags() & ~Qt.FramelessWindowHint
         # )
-        self.master.widget.show()
-        self.tabbar.show()
-        self.status_play_bar(True)
-        self.master.set_dimentions(*self.window.dimensions)
-        self.master.widget.setGeometry(
-            x - int(self.master.width / 2),
-            y - int(self.master.height / 2),
-            self.master.width,
-            self.master.height,
-        )
-        self.layout.setContentsMargins(*FirstTab.marg)
-        self.tab.mouseMoveEvent = lambda event: None
-        self.tab.setMouseTracking(False)
-        PanelWithSongs(self)
-        but = QPushButton(self.tab)
-        but.setGeometry(200, 400, 10, 50)
-        # but.clicked.connect(lambda : self.master.widget.setWindowFlag(Qt.WindowStaysOnTopHint))
-        self.tab.setWindowFlag(Qt.WindowStaysOnTopHint)
-
-
+        # # self.master.widget.setWindowFlags(
+        # #     self.master.widget.windowFlags() & ~Qt.WindowStaysOnTopHint
+        # # )
+        # # self.master.widget.show()
+        # self.tabbar.show()
+        # self.status_play_bar(True)
+        # # self.master.set_dimentions(*self.window.dimensions)
+        # # self.master.widget.setGeometry(
+        # #     x - int(self.master.width / 2),
+        # #     y - int(self.master.height / 2),
+        # #     self.master.width,
+        # #     self.master.height,
+        # # )
+        # self.layout.setContentsMargins(*FirstTab.marg)
+        # self.tab.mouseMoveEvent = lambda event: None
+        # self.tab.setMouseTracking(False)
+        # PanelWithSongs(self)
+        # # self.master.widget.hide()
+        QTimer.singleShot(22, lambda : self.tab.setWindowFlag(Qt.WindowStaysOnTopHint))
+        # self.tab.setWindowFlag(Qt.WindowStaysOnTopHint)
+        # self.master.widget.setWindowFlag(Qt.WindowStaysOnTopHint)
+    
     def creation_of_mediaplayer(self):
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
         self.videoWidget = QVideoWidget()
@@ -130,7 +129,7 @@ class FirstTab(MyTab):
         
         self.videoWidget = QVideoWidget()
         self.open_movie(
-            "/home/filip/Documents/qt-learning/songs/Coldplay X Selena Gomez - Let Somebody Go (Official Video).mp4"
+            "/home/filip/Documents/qt-learning/songs/MAGIC! - Rude (Official Video).mp4"
         )
         self.mediaPlayer.setVideoOutput(self.videoWidget)
         self.mediaPlayer.stateChanged.connect(self.media_state_change)
@@ -165,6 +164,7 @@ class FirstTab(MyTab):
         self.start_time_lbl = QLabel("00:00:00")
         self.end_time_lbl = QLabel("00:00:00")
         self.creating_layout(*FirstTab.marg)
+        print("koniec")
         
         # self.layout.setContentsMargins(*FirstTab.marg)
     def open_file(self):
@@ -178,6 +178,7 @@ class FirstTab(MyTab):
         self.tab.mouseMoveEvent = lambda event: None
 
     def moving_window(self, event):
+        print("hahah")
         vid = cv2.VideoCapture(self.video_name)
         height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
         width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -196,35 +197,47 @@ class FirstTab(MyTab):
         height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
         width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
         self.tabbar.hide()
-        self.master.widget.setWindowFlags(Qt.FramelessWindowHint |
-            Qt.WindowStaysOnTopHint)
-        self.tab.setWindowFlags(Qt.FramelessWindowHint |
-            Qt.WindowStaysOnTopHint)
+        # self.master.widget.setWindowFlags(Qt.FramelessWindowHint |
+        #     Qt.WindowStaysOnTopHint)
+        # # self.master.widget.setWindowFlag(Qt.FramelessWindowHint)
+        # self.tab.setWindowFlags(Qt.FramelessWindowHint |
+        #     Qt.WindowStaysOnTopHint)
         print("on top")
         # self.master.widget.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint | Qt.WindowStaysOnTopHint)
-        self.master.widget.show()
+        self.master.widget.setWindowFlag(Qt.WindowStaysOnTopHint)
+        # QTimer.singleShot(20, lambda : self.master.widget.setWindowFlag(Qt.WindowStaysOnTopHint))
+        QTimer.singleShot(20, lambda : self.master.widget.show())
+        self.master.widget.show()#wyrzuca flagi
         self.status_play_bar(False)
-        self.master.set_dimentions(round(width / 5), round(height / 5))
-        if not event:
+        print("xd")
+        print(self.master.widget.width(), self.master.widget.height(), self.master.width, self.master.height, self.tab.width(), self.tab.height())
+        self.master.set_dimentions(round(width / 5), round(height / 5))#setting heigth and width
+        print(self.master.widget.width(), self.master.widget.height(), self.master.width, self.master.height, self.tab.width(), self.tab.height())
+        if not event:#setting position
+            print("xxx")
             self.master.widget.setGeometry(
                 x - int(self.videoWidget.width() / 2) - 3 * int(self.master.width / 2),
                 y - int(self.videoWidget.height() / 2) - 3 * int(self.master.height / 2),
                 self.master.width,
                 self.master.height,
             )
-        if event:
+        if event:#setting position
             self.master.widget.setGeometry(
                     x - int(width / 10),
                     y - int(height / 10),
                     self.master.width,
                     self.master.height,
                 )
+                
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self.tab.setMouseTracking(True)
+        self.tab.setMouseTracking(True) 
         self.tab.mouseMoveEvent = lambda event: self.moving_window(event)
         self.videoWidget.mouseDoubleClickEvent = lambda event: self.change_size(event)
+        # self.tab.setWindowFlag(Qt.WindowStaysOnTopHint)
+        # self.master.widget.setWindowFlag(Qt.WindowStaysOnTopHint)
 
-    def change_size(self, event):
+    def change_size(self, event = None):
+        # self.tab.setWindowFlag(self.tab.windowFlags() & ~Qt.WindowStaysOnTopHint)
         self.videoWidget.mousePressEvent = lambda event: None
         self.videoWidget.mouseReleaseEvent = lambda event: None
         x, y = pyautogui.position()
@@ -235,6 +248,7 @@ class FirstTab(MyTab):
             self.master.widget.windowFlags() & ~Qt.WindowStaysOnTopHint
         )
         self.master.widget.show()
+        print("nieee")
         self.tabbar.show()
         self.status_play_bar(True)
         self.master.set_dimentions(*self.window.dimensions)
@@ -385,6 +399,7 @@ class SpotifyWindow:
     def __init__(self, master):
         self.master = master
         self.window = QTabWidget()
+        self.master.set_dimentions(800, 800)
         self.window.dimensions = self.dim
         self.tab1 = FirstTab(self.master, self.window, "tab1")
         self.tab2 = MyTab(self.master, self.window, "tab2")
