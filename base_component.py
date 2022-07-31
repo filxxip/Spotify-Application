@@ -1,12 +1,14 @@
 from singleton import Singleton
 from PyQt5.QtWidgets import QStackedWidget, QMainWindow
 from PyQt5 import QtCore
+
+
 class BaseForAll(metaclass=Singleton):
     def __init__(self, master, title, styling, starting_window):
         self.master = master
         master.setStyleSheet(open(styling).read())
         self.windows = {}
-        self.widget= QStackedWidget()
+        self.widget = QStackedWidget()
 
         self.widget.setWindowTitle(title)
         self._height = 0
@@ -14,7 +16,15 @@ class BaseForAll(metaclass=Singleton):
         self.add_and_set(starting_window)
         self.show()
 
-    def set_dimentions(self, width, height, minimum_width = False, maximum_width = False, minimum_height = False, maximum_height = False):
+    def set_dimentions(
+        self,
+        width,
+        height,
+        minimum_width=False,
+        maximum_width=False,
+        minimum_height=False,
+        maximum_height=False,
+    ):
         self.height = height
         self.width = width
         if minimum_height:
@@ -38,6 +48,7 @@ class BaseForAll(metaclass=Singleton):
     def width(self, new_value):
         self._width = new_value
         self.widget.setFixedWidth(new_value)
+
     @height.setter
     def height(self, new_value):
         self._height = new_value
@@ -45,7 +56,6 @@ class BaseForAll(metaclass=Singleton):
 
     def add_widget(self, new_widget):
         if self.windows.get(new_widget.__name__):
-            self.x.removeWidget(self.windows[new_widget.__name__])
             del self.windows[new_widget.__name__]
         w = new_widget(self)
         self.windows[new_widget.__name__] = w.window
