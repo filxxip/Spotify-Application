@@ -14,12 +14,153 @@
         "image": "images/cancel1.png",
         "image2": "images/cancel2.png"
     },
-    "small_size":{
+    "small_size": {
         "position_x": 0,
         "position_y": 0,
         "width": 25,
         "height": 25,
         "name": "small_size",
         "image": "images/size_image.png"
+    },
+    "label": {
+        "position_x": 50,
+        "position_y": 20,
+        "width": 700,
+        "height": 550,
+        "name": "image_with_background",
+        "image1": "images/spot.jpg"
+    },
+    "entry_title": {
+        "labeltext": "Title",
+        "placeholder": "title of song...",
+        "edit": true,
+        "label_width": 140,
+        "label_name": "songs",
+        "entry_name": "songs_entry",
+        "second_name":"songs_entryincorrect"
+    },
+    "entry_published_time": {
+        "labeltext": "PublishedTime",
+        "placeholder": "published time of song...",
+        "edit": false,
+        "label_width": 140,
+        "label_name": "songs",
+        "entry_name": "songs_entry2",
+        "second_name":"songs_entry2incorrect"
+    },
+    "entry_author": {
+        "labeltext": "Author",
+        "placeholder": "author of song...",
+        "edit": true,
+        "label_width": 140,
+        "label_name": "songs",
+        "entry_name": "songs_entry",
+        "second_name":"songs_entryincorrect"
+    },
+    "entry_duration": {
+        "labeltext": "Duration",
+        "placeholder": "duration time of song...",
+        "edit": false,
+        "label_width": 140,
+        "label_name": "songs",
+        "entry_name": "songs_entry2",
+        "second_name":"songs_entry2incorrect"
+    },
+    "entry_link": {
+        "labeltext": "Link",
+        "placeholder": "link to the song...",
+        "edit": false,
+        "label_width": 140,
+        "label_name": "songs",
+        "entry_name": "songs_entry2",
+        "second_name":"songs_entry2incorrect"
+    },
+    "entry_views": {
+        "labeltext": "Views",
+        "placeholder": "number of views...",
+        "edit": false,
+        "label_width": 140,
+        "label_name": "songs",
+        "entry_name": "songs_entry2",
+        "second_name":"songs_entry2incorrect"
+    },
+    "searched_box": {
+        "margin_left": 130,
+        "margin_right": 130,
+        "margin_up": 5,
+        "labeltext": "Search",
+        "placeholder": "type searched song...",
+        "spacing": 20,
+        "edit": true,
+        "label_width": 100,
+        "label_name": "songs",
+        "entry_name": "songs_entry"
+    },
+    "new_data_button": {
+        "title": "Setting new data",
+        "text": "Are you sure to set new values in database?",
+        "name": "messagebox_green",
+        "icon": "images/spotifyimg.png"
+    },
+    "download_box": {
+        "margin_left": 130,
+        "margin_right": 130,
+        "margin_up": 5,
+        "spacing": 20,
+        "tofile": "DOWNLOAD TO FILE",
+        "normal": "DOWNLOAD",
+        "lyrics": "SET LYRICS",
+        "object_name": "download_button"
+    },
+    "msgbox_directory": {
+        "title": "Setting directory name",
+        "text": "Would you like to create a mp4 file with some data?",
+        "name": "messagebox_green",
+        "icon": "images/spotifyimg.png"
+    },
+    "msgbox_add_song_local": {
+        "title": "Adding new song",
+        "text": "Are you sure to add new song?",
+        "name": "messagebox_green",
+        "icon": "images/spotifyimg.png"
+    },
+    "msgboxinputdouble": {
+        "window_title": "Names",
+        "window_name": "dialog_directory",
+        "args": [
+            {
+                "label_width": 120,
+                "label_height": 30,
+                "entry_height": 30,
+                "entry_name": "directory_entry",
+                "label_text": "Directory name:",
+                "entry_width": 200,
+                "entry_placeholder": "write your directory name..."
+            },
+            {
+                "label_width": 120,
+                "label_height": 30,
+                "entry_height": 30,
+                "entry_name": "directory_entry",
+                "label_text": "File name:",
+                "entry_width": 200,
+                "entry_placeholder": "write your file name..."
+            }
+        ]
+    },
+    "msgboxinputonce": {
+        "window_title": "Names",
+        "window_name": "dialog_directory",
+        "args": [
+            {
+                "label_width": 120,
+                "label_height": 30,
+                "entry_height": 30,
+                "entry_name": "directory_entry",
+                "label_text": "File name:",
+                "entry_width": 200,
+                "entry_placeholder": "write your file name..."
+            }
+        ]
     }
 }

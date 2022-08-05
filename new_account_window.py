@@ -1,3 +1,4 @@
+import os
 from PyQt5.QtCore import Qt, QSize, QEvent, QTimer
 from PyQt5.QtWidgets import (
     QMessageBox,
@@ -29,7 +30,7 @@ class New_Account_Window:
         self.master = master
         self.window = QDialog()
         self.window.eventFilter = self.eventFilter
-        with open("json_files/new_account_window.json") as file:
+        with open(rf"{os.getcwd()}/json_files/new_account_window.json") as file:
             data = json.load(file)
         self.exit_button = MyButtonwithImage(
             self.window,
@@ -110,7 +111,7 @@ class New_Account_Window:
         self.change_state(*args)
 
     def create_new_user(self):
-        with open("json_files/new_account_window.json") as file:
+        with open(rf"{os.getcwd()}/json_files/new_account_window.json") as file:
             data = json.load(file)["messagebox_new_account"]
         from open_window import OpenWindow
 
@@ -118,7 +119,7 @@ class New_Account_Window:
             **data,
             Great=[QMessageBox.YesRole, lambda: self.master.set_widget(OpenWindow)],
         )
-        with open("json_files/file.json") as file:
+        with open(rf"{os.getcwd()}/json_files/file.json") as file:
             data = json.load(file)
         data.append(
             {
@@ -132,7 +133,7 @@ class New_Account_Window:
                 "gender": self.postioning_entry_gender.__str__(),
             }
         )
-        with open("json_files/file.json", "w") as file:
+        with open(rf"{os.getcwd()}/json_files/file.json", "w") as file:
             json.dump(data, file)
 
     def change_state(self, *widgets):

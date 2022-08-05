@@ -1,3 +1,4 @@
+import os
 from components import MyError
 import sys
 from PyQt5.QtCore import Qt, QSize, QEvent, QTimer
@@ -27,7 +28,7 @@ class LoginWindow:
         self.master = master
         self.window = QDialog()
         self.window.eventFilter = self.eventFilter
-        with open("json_files/data_main_window.json") as data:
+        with open(rf"{os.getcwd()}/json_files/data_main_window.json") as data:
             data = json.load(data)
         self.window.setWindowTitle(data["title_window"])
         self.cancel_button = MyButtonwithImage(
@@ -95,12 +96,12 @@ class LoginWindow:
         QTimer.singleShot(1000, change_state_to_normal)
 
     def check_json(self):
-        with open("json_files/data.json") as file:
+        with open(rf"{os.getcwd()}/json_files/data.json") as file:
             data = json.load(file)
             data2 = data["remembered_data"]
         if self.login == data2["login"] and self.password == data2["password"]:
             if not self.checkbox.state:
-                with open("json_files/data.json", "w") as file:
+                with open(rf"{os.getcwd()}/json_files/data.json", "w") as file:
                     data["remembered_data"] = {"login": "", "password": ""}
                     json.dump(data, file)
             return True
@@ -109,7 +110,7 @@ class LoginWindow:
                 "login": str(self.login),
                 "password": str(self.password),
             }
-            with open("json_files/data.json", "w") as file:
+            with open(rf"{os.getcwd()}/json_files/data.json", "w") as file:
                 json.dump(data, file)
             return True
         return False
@@ -118,7 +119,7 @@ class LoginWindow:
     def submit_command(self, data_message_green):
         try:
             if str(self.login) and str(self.password):
-                with open("json_files/file.json") as file:
+                with open(rf"{os.getcwd()}/json_files/file.json") as file:
                     data = json.load(file)
                 logins = [person["login"] for person in data]
                 passwords = (person["password"] for person in data)

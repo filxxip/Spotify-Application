@@ -1,4 +1,3 @@
-from lib2to3.pgen2.token import OP
 import sys
 from PyQt5.QtWidgets import (
     QApplication,

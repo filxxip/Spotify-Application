@@ -1,3 +1,4 @@
+import os
 from PyQt5.QtWidgets import QDialog, QMessageBox
 import json
 from components import (
@@ -20,7 +21,7 @@ class OpenWindow:
         self.master = master
         self.window = QDialog()
         self.window.eventFilter = self.eventFilter
-        with open("json_files/data_second_window.json") as data:
+        with open(rf"{os.getcwd()}/json_files/data_second_window.json") as data:
             data = json.load(data)
         self.title_label = MyLabelwithImage(self.window, **data["title_label"])
         self.exit_button = MyButtonwithImage(

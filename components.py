@@ -1,3 +1,4 @@
+import os
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import (
     QLabel,
@@ -19,7 +20,7 @@ class Widget_index(Enum):
 class MyError(Exception):
     def __init__(self, text):
 
-        with open("json_files/data_main_window.json") as file:
+        with open(rf"{os.getcwd()}/json_files/data_main_window.json") as file:
             data = json.load(file)["messagebox_red"]
         MyMsgBox(
             text=f"Logged in failed, {text}",
@@ -435,7 +436,7 @@ class Label_Entry_Box_Login(Label_Entry_Box):
     def check(
         self,
     ) -> bool:
-        with open("json_files/file.json") as file:
+        with open(rf"{os.getcwd()}/json_files/file.json") as file:
             file = json.load(file)
             data = [log["login"] for log in file]
         return False if self.__str__() in data or not self.__str__() else True
