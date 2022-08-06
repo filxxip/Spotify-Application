@@ -303,8 +303,10 @@ class FilterList:
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         # self.scroll.horizontalScrollBar().wheelEvent()
 
-        self.scroll.wheelEvent = lambda event: self.scroll.horizontalScrollBar().setValue(
-            self.scroll.horizontalScrollBar().value() + event.angleDelta().y()
+        self.scroll.wheelEvent = (
+            lambda event: self.scroll.horizontalScrollBar().setValue(
+                self.scroll.horizontalScrollBar().value() + event.angleDelta().y()
+            )
         )
         self.groupbox = QGroupBox()
         self.main_layout = QHBoxLayout()
@@ -747,7 +749,6 @@ class SecondTab(MyTab):
                 )
 
         self.filterlist.update(song_name, value, function=part2)
-
 
     def download_normal_command(self):
         def adding_new_song():

@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QApplication,
     QDialog,
+    QGraphicsOpacityEffect,
 )
 
 import pyautogui
@@ -30,6 +31,7 @@ from PyQt5.QtCore import (
     QSize,
     QEvent,
     QThread,
+    QRect,
 )
 from PyQt5.QtGui import QIcon, QCursor
 import cv2
@@ -232,6 +234,7 @@ class CustomVideoPlayer:
         self.videoWidget.mouseDoubleClickEvent = lambda event: self.change_size2(event)
         self.videoWidget.hide()
         self.status_play_bar(False)
+        # self.horizontallayout.setGeometry(QRect(40, 50, 100, 100))
         # self.videoWidget.mousePressEvent = lambda event: self.func1(event)
 
     def autoplay_function(self):
@@ -255,29 +258,30 @@ class CustomVideoPlayer:
         self.mediaPlayer.volumeChanged.connect(self.setSound)
 
     def creating_layout(self, *positions):
-        horizontallayout = QHBoxLayout()
-        horizontallayout.addWidget(self.playbutton, 1)
-        horizontallayout.addWidget(self.previous_video_button, 1)
-        horizontallayout.addWidget(self.next_video_button, 1)
-        horizontallayout.addWidget(self.autoplay_button.button, 1)
-        horizontallayout.addWidget(self.global_keys_button.button, 1)
-        horizontallayout.addWidget(self.soundbutton, 1)
-        horizontallayout.addWidget(self.slider_sound, 10)
-        horizontallayout.addWidget(self.start_time_lbl)
-        horizontallayout.addWidget(self.slider, 70)
-        horizontallayout.addWidget(self.end_time_lbl)
-        horizontallayout.addWidget(self.size_button.button, 1)
+        self.horizontallayout = QHBoxLayout()
+        self.horizontallayout.addWidget(self.playbutton, 1)
+        self.horizontallayout.addWidget(self.previous_video_button, 1)
+        self.horizontallayout.addWidget(self.next_video_button, 1)
+        self.horizontallayout.addWidget(self.autoplay_button.button, 1)
+        self.horizontallayout.addWidget(self.global_keys_button.button, 1)
+        self.horizontallayout.addWidget(self.soundbutton, 1)
+        self.horizontallayout.addWidget(self.slider_sound, 10)
+        self.horizontallayout.addWidget(self.start_time_lbl)
+        self.horizontallayout.addWidget(self.slider, 70)
+        self.horizontallayout.addWidget(self.end_time_lbl)
+        self.horizontallayout.addWidget(self.size_button.button, 1)
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(20, 0, 20, 0)
         self.layout.addWidget(self.videoWidget)
         self.layout.addWidget(self.label.label)
-        self.layout.addLayout(horizontallayout)
+        self.layout.addLayout(self.horizontallayout)
         # self.tab.setLayout(layout)
 
     def thread_function(self):
         self.mythread = ClickThred(
             self.size_button.button.isDown,
             len(self.size_button.allimages),
+            seconds=0,
             miliseconds=300,
         )
         self.mythread.start()
@@ -386,7 +390,6 @@ class CustomVideoPlayer:
         self.master.widget.setWindowFlag(Qt.FramelessWindowHint)
         QTimer.singleShot(20, lambda: self.master.widget.show())
         # self.master.widget.show()  # wyrzuca flagi
-        # self.status_play_bar(False)
         self.remove_func()
         self.master.set_dimentions(screensize.width(), screensize.height())
         self.master.widget.setWindowState(Qt.WindowFullScreen)
@@ -396,10 +399,10 @@ class CustomVideoPlayer:
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.videoWidget.mouseDoubleClickEvent = lambda event: self.change_size(event)
         self.status_play_bar(False)
+        # self.horizontallayout.setGeometry(QRect(40, 40, 100, 100))
         QTest.mousePress(self.tab, Qt.LeftButton)
         self.videoWidget.setMouseTracking(True)
         # self.videoWidget.mouseDoubleClickEvent = lambda event : self.change_size(event)
-        # self.remove_func()
         self.master.widget.setWindowFlags(
             self.master.widget.windowFlags() & ~Qt.WindowStaysOnTopHint
         )
@@ -407,7 +410,14 @@ class CustomVideoPlayer:
         self.mythread.start()
         self.mythread.seton.connect(lambda: self.status_play_bar(True))
         self.mythread.setoff.connect(lambda: self.status_play_bar(False))
-        # self.mythread.finish.connect(lambda: self.signal.signal.emit())
+        # self.tab.setGraphicsEffect(QGraphicsOpacityEffect(opacity = 0.5))
+
+        # self.mythread.seton.connect(lambda: self.tab.setGraphicsEffect(QGraphicsOpacityEffect(opacity = 1)))
+        # self.mythread.setoff.connect(lambda: self.tab.setGraphicsEffect(QGraphicsOpacityEffect(opacity = 0.5)))
+        # self.mythread.setoff.connect(lambda: self.tab.accept())
+        # self.mythread.seton.connect(lambda: print("hello"))
+        # self.mythread.setoff.connect(lambda: print("hello2"))
+        self.horizontallayout.setContentsMargins(50, 0, 50, 5)
 
     def get_status(self):
         return self.status

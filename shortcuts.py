@@ -1,5 +1,7 @@
-from PyQt5.QtWidgets import QPushButton, QShortcut
+import json
+from PyQt5.QtWidgets import QPushButton, QShortcut, QMessageBox
 from pynput import keyboard
+from components import MyMsgBox
 
 import pyautogui
 from PyQt5.QtCore import Qt, QUrl, QTime, QDir, QTimer
@@ -120,6 +122,18 @@ class GlobalKeys:
             lambda: self.videoplayer.forward(5)
             if not self.GLOBAL_KEYS and self.LOCAL_KEYS
             else None
+        )
+        with open("json_files/data_main_window.json") as file:
+            data2 = json.load(file)
+        shortcut = QShortcut(QKeySequence(Qt.Key_I), self.tab)
+        shortcut.activated.connect(
+            lambda: MyMsgBox(
+                **data2["information"], OK=[QMessageBox.YesRole, lambda: None]
+            )
+            if not self.GLOBAL_KEYS and self.LOCAL_KEYS
+            else MyMsgBox(
+                **data2["information2"], OK=[QMessageBox.YesRole, lambda: None]
+            )
         )
         shortcut = QShortcut(QKeySequence(Qt.Key_Left), self.tab)
         shortcut.activated.connect(

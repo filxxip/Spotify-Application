@@ -261,6 +261,7 @@ class FirstTab(MyTab):
 
     def function(self, videoname: str, next=True, slider_position=0):
         videoname = videoname.split("/")[-1]
+        print(slider_position)
         for index, song in enumerate(self.songs_panel):
             if song.song == videoname:
 

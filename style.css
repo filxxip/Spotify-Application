@@ -30,6 +30,14 @@ QDialog {
     background-color: rgb(101, 237, 247);
     border: 1px;
 }
+QDialog#full{
+    background-color: rgb(0, 0, 0);
+    border: 1px;
+}
+QTabWidget#full::pane {
+    background-color: rgb(0, 0, 0);
+    border: 1px;
+}
 
 /* QTabWidget QTabBar{
     background-color: rgb(91, 150, 77);
