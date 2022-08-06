@@ -10,5 +10,4 @@ from spotify_window import SpotifyWindow
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     w = BaseForAll(app, "SPOTIFY", "style.css", SpotifyWindow)
-
     sys.exit(app.exec())

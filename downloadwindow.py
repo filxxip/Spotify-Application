@@ -187,9 +187,10 @@ class SearchResult:
         self.viewslabel.deleteLater()
         self.publishlabel.deleteLater()
         self.layout.deleteLater()
+
     def set_status(self, status):
         self.download_button.setEnabled(status)
-        
+
 
 from base_tab import MyTab
 
@@ -199,10 +200,6 @@ class MyQLineEdit(QLineEdit):
         super(QLineEdit, self).__init__()
         self.setPlaceholderText(placeholder)
         self.setObjectName(object_name)
-
-    # def keyPressEvent(self, event):
-    #     print(event.text())
-    #     return super(MyQLineEdit, self).keyPressEvent(event)
 
 
 class EntryWithLabel:
@@ -291,9 +288,11 @@ class EntriesList:
 
         check_color(*args)
         QTimer.singleShot(1000, lambda: back_color(*args))
+
     def set_status(self, status):
         for name in self.entries:
             self.entries[name].entry.setEnabled(status)
+
 
 class FilterList:
     def __init__(self, number_of_items):
@@ -319,7 +318,7 @@ class FilterList:
         self.scroll.setWidget(self.groupbox)
         self.scroll.setWidgetResizable(True)
 
-    def update(self, name, number):
+    def update(self, name, number, function=None):
         video = VideosSearch(name, limit=number)
         result = video.result()["result"]
         if number != 0:
@@ -347,9 +346,11 @@ class FilterList:
                 self.searchresults = self.searchresults[:number]
             self.signal.signal2.emit(number, False)
             self.number_of_items = number
+            function()
 
         QTimer.singleShot(500, part2)
         self.scroll.horizontalScrollBar().setValue(0)
+
     def set_status(self, status):
         for searchresult in self.searchresults:
             searchresult.set_status(status)
@@ -398,11 +399,11 @@ class EntryWithLabelSearchedBoxAndSpinBox(EntryWithLabel):
         policy.setRetainSizeWhenHidden(True)
         self.prograssbar.setSizePolicy(policy)
         self.prograssbar.setVisible(False)
-    def set_status(self, status = False):
+
+    def set_status(self, status=False):
         self.entry.setEnabled(status)
         self.spinbox.setEnabled(status)
         self.button.setEnabled(status)
-
 
     def keyPress(self, event):
         if event.key() == Qt.Key_Up:
@@ -478,16 +479,23 @@ class DownloadPanel:
             self.layout.addWidget(item)
             item.setObjectName(object_name)
         layout.addLayout(self.layout)
+
     def set_status(self, status):
         self.normal_download_button.setEnabled(status)
         self.lyrics_button.setEnabled(status)
         self.tofile_download_button.setEnabled(status)
 
 
+# class MySignal6(QObject):
+#     signal = pyqtSignal()
+
+
 class Worker(QThread):
-    progress = pyqtSignal()
+    finish = pyqtSignal()
+    finished = pyqtSignal()
 
     def __init__(self, entries):
+        # self.signal = MySignal6()
         self.entries_list = entries
         super().__init__()
 
@@ -499,7 +507,6 @@ class Worker(QThread):
         index = int(index)
         index += 1
         link = self.entries_list["entry_link"].getText()
-        print(link)
         yt = YouTube(link)
         ys = yt.streams.filter(progressive=True).last()
         data[f"{index}.mp4"] = {
@@ -510,8 +517,9 @@ class Worker(QThread):
         }
         with open(rf"{os.getcwd()}/json_files/songs.json", "w") as file:
             json.dump(data, file)
-        print("cosss")
         ys.download(rf"{os.getcwd()}/songs", filename=str(index) + ".mp4")
+        self.finish.emit()
+        # self.signal.signal.emit()
 
 
 class Worker2(QThread):
@@ -526,57 +534,13 @@ class Worker2(QThread):
         super().__init__()
 
     def run(self):
-        # names = (
-        #     "entry_title",
-        #     "entry_author",
-        #     "entry_published_time",
-        #     "entry_duration",
-        #     "entry_link",
-        #     "entry_views",
-        # )
-        # ys, index = self.download()
-        # filename, _ = QFileDialog.getOpenFileName(
-        #     self.tab, "Open Movie", QDir.homePath() + "/filip/Documents/qt-learning"
-        # )
-        # if filename != "":
-        # with open(rf"{os.getcwd()}/json_files/songs.json") as data:
-        #     data = json.load(data)
-        # index = list(data.keys())[-1]
-        # index = index[:-4]
-        # index = int(index)
-        # index += 1
-        # link = self.entries_list["entry_link"].getText()
-        # name = self.entries_list["entry_title"].getText()
-        # print(link)
-        # yt = YouTube(link)
-        # ys = yt.streams.filter(progressive=True).last()
-        # data[f"{index}.mp4"] = {
-        #     "title": self.entries_list["entry_title"].getText(),
-        #     "author": self.entries_list["entry_author"].getText(),
-        #     "length": yt.length,
-        #     "views": yt.views,
-        # }
-        # with open(rf"{os.getcwd()}/json_files/songs.json", "w") as file:
-        #     json.dump(data, file)
-        # print("cosss")
-        # ys.download(self.path, filename=name + ".mp4")
         if self.directory_name:
             self.path += f"/{self.directory_name}"
             os.mkdir(self.path)
         link = self.entries_list["entry_link"].getText()
         # name = self.entries_list["entry_title"].getText()
-        print(link)
         yt = YouTube(link)
         ys = yt.streams.filter(progressive=True).last()
-        # data[f"{index}.mp4"] = {
-        #     "title": self.entries_list["entry_title"].getText(),
-        #     "author": self.entries_list["entry_author"].getText(),
-        #     "length": yt.length,
-        #     "views": yt.views,
-        # }
-        # with open(rf"{os.getcwd()}/json_files/songs.json", "w") as file:
-        #     json.dump(data, file)
-        # print("cosss")
         ys.download(self.path, filename=self.file_name + ".mp4")
 
 
@@ -616,7 +580,6 @@ class MyInputMsg(QInputDialog):
             if index == 0:
 
                 button.clicked.connect(lambda: self.button_command())
-            print(button)
         self.dialog.exec()
 
     def button_command(self):
@@ -655,12 +618,16 @@ class MyInputMsg(QInputDialog):
         return label.text(), entry
 
 
+class MySignal5(QObject):
+    signal = pyqtSignal()
+
+
 class SecondTab(MyTab):
     def __init__(self, master, window, title, number_of_items):
         super().__init__(master, window, title)
         self.filterlist = FilterList(number_of_items)
         self.entries_list = EntriesList()
-
+        self.signal = MySignal5()
         for searchbox in self.filterlist.searchresults:
             searchbox.signal.signal.connect(lambda arg: self.command_for_setter(arg))
         self.layout = QVBoxLayout(self.tab)
@@ -685,7 +652,6 @@ class SecondTab(MyTab):
             )
             else self.entries_list.check("entry_link", "entry_title", "entry_author")
         )
-        print(self.entries_list["entry_link"])
         self.download_panel.tofile_download_button.clicked.connect(
             lambda: self.download_to_file()
             if self.entries_list["entry_link"]
@@ -770,24 +736,33 @@ class SecondTab(MyTab):
             x.update(video.result()["result"][i])
 
     def update_command(self, value, song_name):
-        self.filterlist.update(song_name, value)
-        for searchbox in self.filterlist.searchresults:
-            searchbox.signal.signal.connect(lambda arg: self.command_for_setter(arg))
+        def part2():
+            for searchbox in self.filterlist.searchresults:
+                try:
+                    searchbox.signal.disconnect()
+                except:
+                    pass
+                searchbox.signal.signal.connect(
+                    lambda arg: self.command_for_setter(arg)
+                )
+
+        self.filterlist.update(song_name, value, function=part2)
+
 
     def download_normal_command(self):
-        # self.set_status(False)
         def adding_new_song():
             self.worker = Worker(self.entries_list)
             self.worker.start()
-            self.worker.progress.connect(self.worker.run)
+            self.worker.finish.connect(lambda: self.signal.signal.emit())
+            # self.worker.finished.connect(lambda: self.signal.signal.emit())
+
         with open("json_files/data_spotify_window.json") as file:
             data = json.load(file)
         MyMsgBox(
             **data["msgbox_add_song_local"],
             Yeah=[QMessageBox.YesRole, adding_new_song],
-            Nope=[QMessageBox.NoRole, lambda : None],
+            Nope=[QMessageBox.NoRole, lambda: None],
         )
-        # self.set_status()
 
     def download_to_file(self):
         self.set_status(False)
@@ -859,29 +834,8 @@ class SecondTab(MyTab):
         )
         self.set_status(True)
 
-        # file = QFileDialog.getExistingDirectory(
-        #     self.tab, "Set directory", QDir.homePath()
-        #     )
-        #     name: str = self.entries_list["entry_title"].getText()
-        #     while " " in name:
-        #         name = name.replace(" ", "_")
-        # MyMsgBox(
-        #     **data,
-        #     Yeah=[QMessageBox.YesRole, directory],
-        #     Nope=[QMessageBox.NoRole, alone],
-        # )
-        # file = QFileDialog.getExistingDirectory(
-        #     self.tab, "Set directory", QDir.homePath()
-        # )
-        # name: str = self.entries_list["entry_title"].getText()
-        # while " " in name:
-        #     name = name.replace(" ", "_")
-        # os.mkdir(file + f"/{name}")
-    def set_status(self, status = True):
+    def set_status(self, status=True):
         self.new_song_entry.set_status(status)
         self.download_panel.set_status(status)
         self.filterlist.set_status(status)
         self.entries_list.set_status(status)
-        # self.download_panel.tofile_download_button.setEnabled(False)
-        # self.download_panel.normal_download_button.setEnabled(False)
-        # self.download_panel.lyrics_button.setEnabled(False)

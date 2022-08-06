@@ -14,15 +14,27 @@ import json
 # import requests
 from youtubesearchpython import VideosSearch
 from components import MyButtonwithImage, MyLabelwithText
-from PyQt5.QtCore import Qt, QRect, QSize, pyqtSignal, QObject, QUrl, QPropertyAnimation, QPoint, pyqtProperty
+from PyQt5.QtCore import (
+    Qt,
+    QRect,
+    QSize,
+    pyqtSignal,
+    QObject,
+    QUrl,
+    QPropertyAnimation,
+    QPoint,
+    pyqtProperty,
+)
 import os
 from videowidget import CustomVideoPlayer
 from PyQt5.QtGui import QPixmap, QIcon, QImage, QColor
 from base_tab import MyTab
 
+
 class Status(enum.Enum):
     START = enum.auto()
     STOP = enum.auto()
+
 
 class Play_button:
     def __init__(self, image=True):
@@ -39,12 +51,13 @@ class Play_button:
         else:
             self.image1 = QIcon(rf"{os.getcwd()}/images/empty.png")
             self.button.setIcon(self.image1)
+
     def set_icon(self):
         if self.status == Status.START:
             self.button.setIcon(self.image1)
         else:
             self.button.setIcon(self.image2)
-    
+
     @property
     def play_status(self):
         return self.status
@@ -124,6 +137,10 @@ class ForLabel:
             self.signal.signal.emit(None)
 
 
+class MySignal6(QObject):
+    signal = pyqtSignal()
+
+
 class PanelWithSongs:
     def __init__(self, master, main_layout):
         self.main_layout = main_layout
@@ -132,6 +149,7 @@ class PanelWithSongs:
         with open(rf"{os.getcwd()}/json_files/songs.json") as file:
             data = json.load(file)
         self.all_layouts = []
+        self.signal = MySignal6()
         # self.layout = QVBoxLayout()
         self.layout = QVBoxLayout()
         self.groupbox = QGroupBox()
@@ -167,15 +185,39 @@ class PanelWithSongs:
             data = json.load(file)
         # self.main_layout.addLayout(self.layout, 5)
         self.main_layout.addWidget(self.scroll, 5)
+        self.scroll.show()
 
     def hide(self):
+        print("chowa")
         self.main_layout.removeWidget(self.scroll)
+        self.scroll.hide()
 
     def uncheck(self, playbutton):
         for lay in self:
             if lay.playbutton != playbutton:
                 if lay.playbutton.status != Status.START:
                     lay.playbutton.play_status = Status.START
+
+    def update_list(self):
+        with open(rf"{os.getcwd()}/json_files/songs.json") as file:
+            data = json.load(file)
+        song = list(data.keys())[-1]
+        index = len(list(data.keys()))
+        song = song[:-4]
+        song = int(song)
+        song = f"{song}.mp4"
+        layout = ForLabel(
+            self.tab,
+            index,
+            song,
+            data[song]["title"],
+            data[song]["author"],
+            data[song]["length"],
+            self.uncheck,
+        )
+        self.all_layouts.append(layout)
+        self.layout.addLayout(layout.layout, 4)
+        self.signal.signal.emit()
 
     def __iter__(self):
         yield from self.all_layouts
@@ -208,8 +250,14 @@ class FirstTab(MyTab):
         self.layout.setContentsMargins(10, 30, 10, 55)
         self.tab.setLayout(self.layout)
         for lay in self.songs_panel:
-            lay.signal.signal.connect(self.videoplayer.open_movie)
+            lay.signal.signal.connect(self.videoplayer.open_movie)  # tu jest problem
         self.videoplayer.signal.signal.connect(self.function)
+        self.songs_panel.signal.signal.connect(self.updatesignalfunction)
+
+    def updatesignalfunction(self):
+        self.songs_panel.all_layouts[-1].signal.signal.connect(
+            self.videoplayer.open_movie
+        )
 
     def function(self, videoname: str, next=True, slider_position=0):
         videoname = videoname.split("/")[-1]

@@ -20,7 +20,14 @@
         "width": 25,
         "height": 25,
         "name": "small_size",
-        "image": "images/size_image.png"
+        "image": "images/size0.png",
+        "image02": "images/size1.png",
+        "image03": "images/size2.png",
+        "image04": "images/size3.png",
+        "image05": "images/size4.png",
+        "image06": "images/size5.png",
+        "image07": "images/size6.png",
+        "image08": "images/size7.png"
     },
     "label": {
         "position_x": 50,
@@ -37,7 +44,7 @@
         "label_width": 140,
         "label_name": "songs",
         "entry_name": "songs_entry",
-        "second_name":"songs_entryincorrect"
+        "second_name": "songs_entryincorrect"
     },
     "entry_published_time": {
         "labeltext": "PublishedTime",
@@ -46,7 +53,7 @@
         "label_width": 140,
         "label_name": "songs",
         "entry_name": "songs_entry2",
-        "second_name":"songs_entry2incorrect"
+        "second_name": "songs_entry2incorrect"
     },
     "entry_author": {
         "labeltext": "Author",
@@ -55,7 +62,7 @@
         "label_width": 140,
         "label_name": "songs",
         "entry_name": "songs_entry",
-        "second_name":"songs_entryincorrect"
+        "second_name": "songs_entryincorrect"
     },
     "entry_duration": {
         "labeltext": "Duration",
@@ -64,7 +71,7 @@
         "label_width": 140,
         "label_name": "songs",
         "entry_name": "songs_entry2",
-        "second_name":"songs_entry2incorrect"
+        "second_name": "songs_entry2incorrect"
     },
     "entry_link": {
         "labeltext": "Link",
@@ -73,7 +80,7 @@
         "label_width": 140,
         "label_name": "songs",
         "entry_name": "songs_entry2",
-        "second_name":"songs_entry2incorrect"
+        "second_name": "songs_entry2incorrect"
     },
     "entry_views": {
         "labeltext": "Views",
@@ -82,7 +89,7 @@
         "label_width": 140,
         "label_name": "songs",
         "entry_name": "songs_entry2",
-        "second_name":"songs_entry2incorrect"
+        "second_name": "songs_entry2incorrect"
     },
     "searched_box": {
         "margin_left": 130,

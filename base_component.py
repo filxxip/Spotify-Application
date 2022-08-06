@@ -9,7 +9,6 @@ class BaseForAll(metaclass=Singleton):
         master.setStyleSheet(open(styling).read())
         self.windows = {}
         self.widget = QStackedWidget()
-
         self.widget.setWindowTitle(title)
         self._height = 0
         self._width = 0

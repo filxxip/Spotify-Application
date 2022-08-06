@@ -1,5 +1,6 @@
 import enum
 import os
+import time
 from PyQt5.QtWidgets import (
     QMessageBox,
     QVBoxLayout,
@@ -9,6 +10,8 @@ from PyQt5.QtWidgets import (
     QSlider,
     QStyle,
     QFileDialog,
+    QApplication,
+    QDialog,
 )
 
 import pyautogui
@@ -16,7 +19,18 @@ import json
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from components import MyButtonwithImage, MyLabelwithImage, MyMsgBox
-from PyQt5.QtCore import Qt, QUrl, QTime, QDir, QTimer, QObject, pyqtSignal, QSize
+from PyQt5.QtCore import (
+    Qt,
+    QUrl,
+    QTime,
+    QDir,
+    QTimer,
+    QObject,
+    pyqtSignal,
+    QSize,
+    QEvent,
+    QThread,
+)
 from PyQt5.QtGui import QIcon, QCursor
 import cv2
 from shortcuts import GlobalKeys
@@ -26,6 +40,7 @@ from PyQt5.QtTest import QTest
 class Status(enum.Enum):
     FULL = enum.auto()
     SMALL = enum.auto()
+    FULLSIZE = enum.auto()
 
 
 class MySingal(QObject):
@@ -72,6 +87,105 @@ class ImageChangableButton:
             self.button.leaveEvent = lambda event: self.change_event(event)
 
 
+import datetime
+
+
+class GUIThread(QThread):
+    seton = pyqtSignal()
+    setoff = pyqtSignal()
+
+    def __init__(self, function):
+        # self.signal = MySignal6()
+        self.function = function
+        super().__init__()
+
+    def run(self):
+        while True:
+            time.sleep(0.25)
+            if self.function() == Status.FULLSIZE:
+                if pyautogui.position().y > 1000:
+                    self.seton.emit()
+                else:
+                    self.setoff.emit()
+            else:
+                break
+
+
+class ClickThred(QThread):
+    long_process = pyqtSignal()
+    short_process = pyqtSignal()
+    change_color = pyqtSignal(int)
+
+    def __init__(self, buttoncheck, number_states, seconds=1, miliseconds=0):
+        self.buttoncheck = buttoncheck
+        self.number_states = number_states
+        self.seconds = seconds
+        self.miliseconds = miliseconds
+        super().__init__()
+
+    def run(self):
+        time = datetime.datetime.now()
+        deltatime = datetime.timedelta(
+            seconds=self.seconds, milliseconds=self.miliseconds
+        )
+        basic = 0
+        deltastate = self.seconds * 1000 + self.miliseconds
+        deltastate = int(deltastate / self.number_states)
+        while self.buttoncheck():
+            time2 = datetime.datetime.now()
+            diff = time2 - time
+            if diff > datetime.timedelta(milliseconds=deltastate * basic):
+                self.change_color.emit(basic)
+                basic += 1
+            if diff > deltatime:
+                self.long_process.emit()
+                self.change_color.emit(0)
+                return
+        time2 = datetime.datetime.now()
+        self.short_process.emit()
+        self.change_color.emit(0)
+
+
+class CustomizeButtonWithImage(MyButtonwithImage):
+    def __init__(
+        self,
+        master,
+        position_x,
+        position_y,
+        width,
+        height,
+        name,
+        function_clicked=None,
+        function_pressed=None,
+        function_released=None,
+        image=None,
+        name2=None,
+        image2=None,
+        **restimages,
+    ):
+        super().__init__(
+            master,
+            position_x,
+            position_y,
+            width,
+            height,
+            name,
+            function_clicked,
+            function_pressed,
+            function_released,
+            image,
+            name2,
+            image2,
+        )
+        self.allimages = [QIcon(image)]
+        for image in restimages.values():
+            self.allimages.append(QIcon(image))
+        self.button.setIcon(self.allimages[0])
+
+    def change_state(self, index):
+        self.button.setIcon(self.allimages[index])
+
+
 class CustomVideoPlayer:
     marg = 10, 30, 10, 55
 
@@ -84,7 +198,7 @@ class CustomVideoPlayer:
         self.window = window
         self.remove_func = removing_function
         self.see_func = seeing_function
-        self.tab = tab
+        self.tab: QDialog = tab
         self.main_layout = layout
         with open(rf"{os.getcwd()}/json_files/data_spotify_window.json") as data:
             data = json.load(data)
@@ -153,7 +267,6 @@ class CustomVideoPlayer:
         horizontallayout.addWidget(self.slider, 70)
         horizontallayout.addWidget(self.end_time_lbl)
         horizontallayout.addWidget(self.size_button.button, 1)
-
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(20, 0, 20, 0)
         self.layout.addWidget(self.videoWidget)
@@ -161,11 +274,43 @@ class CustomVideoPlayer:
         self.layout.addLayout(horizontallayout)
         # self.tab.setLayout(layout)
 
+    def thread_function(self):
+        self.mythread = ClickThred(
+            self.size_button.button.isDown,
+            len(self.size_button.allimages),
+            miliseconds=300,
+        )
+        self.mythread.start()
+        if self.status == Status.FULL:
+            try:
+                self.mythread.long_process.disconnect()
+            except:
+                pass
+            self.mythread.long_process.connect(lambda: self.full_screen())
+        elif self.status == Status.FULLSIZE:
+            try:
+                self.mythread.long_process.disconnect()
+            except:
+                pass
+            self.mythread.long_process.connect(
+                lambda: self.change_size(change_position=False)
+            )  # cos zeby ladnie sie wgralo
+        self.mythread.short_process.connect(lambda: self.change_size2())
+        self.mythread.change_color.connect(lambda index: self.change_color(index))
+
+    def change_color(self, index):
+        try:
+            self.size_button.change_state(index)
+        except IndexError:
+            pass
+
     def creation_of_layout(self):
         with open(rf"{os.getcwd()}/json_files/data_spotify_window.json") as data:
             data = json.load(data)
-        self.size_button = MyButtonwithImage(
-            self.tab, **data["small_size"], function_clicked=lambda: self.change_size2()
+        self.size_button = CustomizeButtonWithImage(
+            self.tab,
+            **data["small_size"],
+            function_pressed=lambda: self.thread_function(),
         )
         self.size_button.button.setMaximumSize(20, 20)
         self.playbutton = QPushButton()
@@ -220,8 +365,52 @@ class CustomVideoPlayer:
             self.global_keys.GLOBAL_KEYS,
             size=(24, 24),
         )
-
         self.creating_layout(*CustomVideoPlayer.marg)
+
+    def full_screen(self):
+        # self.master.widget.hide()
+        # self.videoWidget.showFullScreen()
+        # self.videoWidget.setFullScreen(True)
+        # self.master.widget.showMaximized()
+        # pyautogui.displayMousePosition()
+        screen = self.master.master.primaryScreen()
+        screensize = screen.size()
+
+        # if not event or event.button() == Qt.LeftButton:
+        self.status = Status.FULLSIZE
+
+        # self.videoWidget.setCursor(Qt.DragMoveCursor)
+        # self.videoWidget.mousePressEvent = lambda event: self.func1(event)
+        # self.videoWidget.mouseReleaseEvent = lambda event: self.func2(event)
+        self.master.widget.setWindowFlag(Qt.WindowStaysOnTopHint)
+        self.master.widget.setWindowFlag(Qt.FramelessWindowHint)
+        QTimer.singleShot(20, lambda: self.master.widget.show())
+        # self.master.widget.show()  # wyrzuca flagi
+        # self.status_play_bar(False)
+        self.remove_func()
+        self.master.set_dimentions(screensize.width(), screensize.height())
+        self.master.widget.setWindowState(Qt.WindowFullScreen)
+        # self.videoWidget.setFullScreen(True)
+        self.master.widget.setGeometry(0, 0, self.master.width, self.master.height)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.videoWidget.mouseDoubleClickEvent = lambda event: self.change_size(event)
+        self.status_play_bar(False)
+        QTest.mousePress(self.tab, Qt.LeftButton)
+        self.videoWidget.setMouseTracking(True)
+        # self.videoWidget.mouseDoubleClickEvent = lambda event : self.change_size(event)
+        # self.remove_func()
+        self.master.widget.setWindowFlags(
+            self.master.widget.windowFlags() & ~Qt.WindowStaysOnTopHint
+        )
+        self.mythread = GUIThread(self.get_status)
+        self.mythread.start()
+        self.mythread.seton.connect(lambda: self.status_play_bar(True))
+        self.mythread.setoff.connect(lambda: self.status_play_bar(False))
+        # self.mythread.finish.connect(lambda: self.signal.signal.emit())
+
+    def get_status(self):
+        return self.status
 
     def open_file(self):
         filename, _ = QFileDialog.getOpenFileName(
@@ -253,8 +442,6 @@ class CustomVideoPlayer:
     def change_size2(self, event=None, change_position=True):
         if not event or event.button() == Qt.LeftButton:
             self.status = Status.SMALL
-            
-
             self.videoWidget.setCursor(Qt.DragMoveCursor)
             self.videoWidget.mousePressEvent = lambda event: self.func1(event)
             self.videoWidget.mouseReleaseEvent = lambda event: self.func2(event)
@@ -311,19 +498,31 @@ class CustomVideoPlayer:
     def change_size(self, event=None, change_position=True):
         # self.videoWidget.setFullScreen(True)
         if not event or event.button() == Qt.LeftButton:
-            self.videoWidget.unsetCursor()
-            
+            # self.layout.addWidget(self.videoWidget)
+            # self.videoWidget.setFullScreen(False)
+            # self.videoWidget.hide()
+            # self.videoWidget.showFullScreen()
+            # self.videoWidget.setWindowFlag(Qt.WindowFullScreen)
+            # self.videoWidget.unsetCursor()
+            # self.layout.addWidget(self.videoWidget)
+            # self.mediaPlayer.setVideoOutput(self.videoWidget)
+            # self.videoWidget.show()
+
             self.status = Status.FULL
             self.videoWidget.mousePressEvent = lambda event: None
             self.videoWidget.mouseReleaseEvent = lambda event: None
             x, y = pyautogui.position()
+            self.videoWidget.windowState()
+            self.master.widget.setWindowState(
+                self.master.widget.windowState() & ~Qt.WindowFullScreen
+            )
             self.master.widget.setWindowFlags(
                 self.master.widget.windowFlags() & ~Qt.FramelessWindowHint
             )
             self.master.widget.setWindowFlags(
                 self.master.widget.windowFlags() & ~Qt.WindowStaysOnTopHint
             )
-            self.master.widget.show()
+            # self.master.widget.show()
             self.see_func()
             # self.tabbar.show()
             self.status_play_bar(True)
@@ -339,6 +538,7 @@ class CustomVideoPlayer:
                 self.master.widget.setGeometry(
                     x, y, self.master.width, self.master.height
                 )
+            self.master.widget.show()
             self.main_layout.setContentsMargins(*CustomVideoPlayer.marg)
             self.layout.setContentsMargins(20, 0, 20, 0)
             self.tab.mouseMoveEvent = lambda event: None
@@ -382,7 +582,7 @@ class CustomVideoPlayer:
 
     def set_spotife_title(self, status=True):
         if status:
-            if self.status == Status.SMALL:
+            if self.status == Status.SMALL or self.status == Status.FULLSIZE:
                 self.change_size()
             self.global_keys.LOCAL_KEYS = False
             self.label.label.show()
@@ -416,8 +616,8 @@ class CustomVideoPlayer:
             media = QMediaContent(QUrl.fromLocalFile(name))
             self.mediaPlayer.setMedia(media)
             # QTimer.singleShot(20, self.playbutton.click)
-            if self.status == Status.SMALL:
-                self.change_size2(change_position=False)
+            # if self.status == Status.SMALL:
+            #     self.change_size2(change_position=False)
             if play:
                 QTimer.singleShot(20, self.playbutton.click)
         else:
