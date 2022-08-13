@@ -31,7 +31,6 @@ from PyQt5.QtCore import Qt, QRect, QSize, pyqtSignal, QObject, QUrl
 import os
 from videowidget import CustomVideoPlayer
 from PyQt5.QtGui import QPixmap, QIcon, QImage
-from PyQt5.QtWebEngineWidgets import QWebEngineView
 from firstwindow import FirstTab
 from downloadwindow import SecondTab
 
@@ -52,6 +51,10 @@ class SpotifyWindow:
         # self.tab2.worker.signal.signal.connect(self.tab1.songs_panel.update_list)
         # self.tab3 = MyTab(self.master, self.window, "tab3")
         # self.tab4 = MyTab(self.master, self.window, "tab4")
+
+    def post_init(self, *args):
+        print("hello", args)
+        self.tab1.songs_panel.post_init(*args)
 
     @property
     def dim(self):

@@ -121,29 +121,29 @@ class New_Account_Window:
         )
         with open(rf"{os.getcwd()}/json_files/file.json") as file:
             data = json.load(file)
-        data.append(
-            {
-                "name": self.postioning_entry_name.__str__(),
-                "surname": self.postioning_entry_surname.__str__(),
-                "login": self.postioning_entry_login.__str__(),
-                "password": self.postioning_entry_password.__str__(),
-                "age": self.postioning_entry_age.__str__(),
-                "country": self.postioning_entry_coutry.__str__(),
-                "nationality": self.postioning_entry_nationality.__str__(),
-                "gender": self.postioning_entry_gender.__str__(),
-            }
-        )
+        data[self.postioning_entry_login.__str__()] = {
+            "name": self.postioning_entry_name.__str__(),
+            "surname": self.postioning_entry_surname.__str__(),
+            "password": self.postioning_entry_password.__str__(),
+            "age": self.postioning_entry_age.__str__(),
+            "country": self.postioning_entry_coutry.__str__(),
+            "nationality": self.postioning_entry_nationality.__str__(),
+            "gender": self.postioning_entry_gender.__str__(),
+            "songs": [],
+        }
         with open(rf"{os.getcwd()}/json_files/file.json", "w") as file:
             json.dump(data, file)
 
     def change_state(self, *widgets):
         def changing_state_first(widgets):
             state = True
+            incorrects = []
             for item_widget, badchangename, goodchangename in widgets:
                 if item_widget.check():
                     change(item_widget, goodchangename)
                 else:
                     change(item_widget, badchangename)
+                    incorrects.append(item_widget)
                     state = False
             if str(self.postioning_entry_repeat) != str(self.postioning_entry_password):
                 state = False
@@ -151,6 +151,20 @@ class New_Account_Window:
                 change(self.postioning_entry_password, badchangename)
             if state:
                 self.create_new_user()
+            else:
+                with open(rf"{os.getcwd()}/json_files/new_account_window.json") as file:
+                    data = json.load(file)
+                text = ""
+                for index, cls in enumerate(incorrects):
+                    text += f"{index+1} -> {data[cls.__class__.__name__]}\n"
+                MyMsgBox(
+                    title="Error in creating new account.",
+                    text=text,
+                    name="messagebox_red",
+                    icon="images/spotifyimg.png",
+                    OK=[QMessageBox.YesRole, lambda: None],
+                )
+                incorrects.clear()
 
         def changing_state_back(widgets):
             for item_widget, oldname in widgets:

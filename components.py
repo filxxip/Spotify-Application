@@ -1,15 +1,10 @@
-import os
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import (
-    QLabel,
-    QPushButton,
-    QLineEdit,
-    QMessageBox,
-    QCheckBox,
-)
-from PyQt5.QtGui import QPixmap, QIcon, QCursor
 import json
+import os
 from enum import Enum
+
+from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QCursor, QIcon, QPixmap
+from PyQt5.QtWidgets import QCheckBox, QLabel, QLineEdit, QMessageBox, QPushButton
 
 
 class Widget_index(Enum):
@@ -438,7 +433,7 @@ class Label_Entry_Box_Login(Label_Entry_Box):
     ) -> bool:
         with open(rf"{os.getcwd()}/json_files/file.json") as file:
             file = json.load(file)
-            data = [log["login"] for log in file]
+            data = [log for log in file]
         return False if self.__str__() in data or not self.__str__() else True
 
 

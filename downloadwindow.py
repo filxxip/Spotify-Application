@@ -668,6 +668,7 @@ class SecondTab(MyTab):
         self.new_song_entry.signal.signal.connect(
             lambda value, song_name: self.update_command(value, song_name)
         )
+        self.create_movie()
 
     def creation_label(self):
         with open(rf"{os.getcwd()}/json_files/data_spotify_window.json") as data:
@@ -750,11 +751,37 @@ class SecondTab(MyTab):
 
         self.filterlist.update(song_name, value, function=part2)
 
+    def create_movie(self):
+        margin = self.download_panel.layout.contentsMargins()
+        margin.setRight(80)
+        self.download_panel.layout.setContentsMargins(margin)
+        self.load_label = QLabel(self.tab)
+        self.load_label.setFixedSize(QSize(30, 30))
+        self.download_panel.layout.addWidget(self.load_label)
+        self.movie = QMovie("loading.gif")
+        self.movie.setScaledSize(QSize(30, 30))
+        self.load_label.setMovie(self.movie)
+        self.load_label.setVisible(False)
+        policy = self.load_label.sizePolicy()
+        policy.setRetainSizeWhenHidden(True)
+        self.load_label.setSizePolicy(policy)
+
+    def finished_download_normal(self):
+        self.signal.signal.emit()  # change list
+        self.load_label.setVisible(False)
+        self.movie.stop()
+        self.set_status(True)
+
+
+        
     def download_normal_command(self):
         def adding_new_song():
             self.worker = Worker(self.entries_list)
+            self.load_label.setVisible(True)
+            self.set_status(False)
+            self.movie.start()
             self.worker.start()
-            self.worker.finish.connect(lambda: self.signal.signal.emit())
+            self.worker.finish.connect(lambda: self.finished_download_normal())
             # self.worker.finished.connect(lambda: self.signal.signal.emit())
 
         with open("json_files/data_spotify_window.json") as file:

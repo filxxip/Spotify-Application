@@ -88,5 +88,13 @@
         "text":"Congratulation, you have created new account",
         "icon": "images/spotifyimg.png",
         "name": "messagebox_green"
-    }
+    },
+    "Label_Entry_Box_Name":"Name must begin with capital letter!",
+    "Label_Entry_Box_Age":"Age must be number type!",
+    "Label_Entry_Box_Surname":"Surname must begin with capital letter!",
+    "Label_Entry_Box_Nationality":"Nationality must begin with capital letter!",
+    "Label_Entry_Box_Country":"Country must begin with capital letter!",
+    "Label_Entry_Box_Login":"Login is still be using by other user!",
+    "Label_Entry_Box_Password":"Password must contain any capital letter!",
+    "Label_Entry_Box_Gender":"Gender must be equal to male or female!"
 }

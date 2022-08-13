@@ -10,9 +10,7 @@ from PyQt5.QtWidgets import (
     QSlider,
     QStyle,
     QFileDialog,
-    QApplication,
     QDialog,
-    QGraphicsOpacityEffect,
 )
 
 import pyautogui
@@ -29,9 +27,7 @@ from PyQt5.QtCore import (
     QObject,
     pyqtSignal,
     QSize,
-    QEvent,
     QThread,
-    QRect,
 )
 from PyQt5.QtGui import QIcon, QCursor
 import cv2
@@ -46,7 +42,7 @@ class Status(enum.Enum):
 
 
 class MySingal(QObject):
-    signal = pyqtSignal(str, bool, int)
+    signal = pyqtSignal(bool, int)
 
 
 class ImageChangableButton:
@@ -226,16 +222,10 @@ class CustomVideoPlayer:
         QTimer.singleShot(1, f)
         QTimer.singleShot(1, f2)
         QTimer.singleShot(22, lambda: self.tab.setWindowFlag(Qt.WindowStaysOnTopHint))
-        # self.label.label.hide()  # chowac label i tab
-        # self.open_movie(
-        #     "/home/filip/Documents/qt-learning/songs/Bruno Mars - Just The Way You Are (Official Music Video).mp4"
-        # )
         self.master.widget.closeEvent = lambda event: self.exit_func(event)
         self.videoWidget.mouseDoubleClickEvent = lambda event: self.change_size2(event)
         self.videoWidget.hide()
         self.status_play_bar(False)
-        # self.horizontallayout.setGeometry(QRect(40, 50, 100, 100))
-        # self.videoWidget.mousePressEvent = lambda event: self.func1(event)
 
     def autoplay_function(self):
         if self.autoplay:
@@ -328,9 +318,7 @@ class CustomVideoPlayer:
         self.previous_video_button = QPushButton()
         self.previous_video_button.setObjectName("aaa")
         self.previous_video_button.clicked.connect(
-            lambda: self.signal.signal.emit(
-                self.video_name, False, self.slider.sliderPosition()
-            )
+            lambda: self.signal.signal.emit(False, self.slider.sliderPosition())
         )
         self.previous_video_button.setIcon(
             self.tab.style().standardIcon(QStyle.SP_MediaSeekBackward)
@@ -338,9 +326,7 @@ class CustomVideoPlayer:
         self.next_video_button = QPushButton()
         self.next_video_button.setObjectName("aaa")
         self.next_video_button.clicked.connect(
-            lambda: self.signal.signal.emit(
-                self.video_name, True, self.slider.sliderPosition()
-            )
+            lambda: self.signal.signal.emit(True, self.slider.sliderPosition())
         )
         self.next_video_button.setIcon(
             self.tab.style().standardIcon(QStyle.SP_MediaSeekForward)
@@ -372,52 +358,39 @@ class CustomVideoPlayer:
         self.creating_layout(*CustomVideoPlayer.marg)
 
     def full_screen(self):
-        # self.master.widget.hide()
-        # self.videoWidget.showFullScreen()
-        # self.videoWidget.setFullScreen(True)
-        # self.master.widget.showMaximized()
-        # pyautogui.displayMousePosition()
         screen = self.master.master.primaryScreen()
         screensize = screen.size()
-
-        # if not event or event.button() == Qt.LeftButton:
         self.status = Status.FULLSIZE
-
-        # self.videoWidget.setCursor(Qt.DragMoveCursor)
-        # self.videoWidget.mousePressEvent = lambda event: self.func1(event)
-        # self.videoWidget.mouseReleaseEvent = lambda event: self.func2(event)
         self.master.widget.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.master.widget.setWindowFlag(Qt.FramelessWindowHint)
         QTimer.singleShot(20, lambda: self.master.widget.show())
-        # self.master.widget.show()  # wyrzuca flagi
         self.remove_func()
         self.master.set_dimentions(screensize.width(), screensize.height())
         self.master.widget.setWindowState(Qt.WindowFullScreen)
-        # self.videoWidget.setFullScreen(True)
         self.master.widget.setGeometry(0, 0, self.master.width, self.master.height)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.videoWidget.mouseDoubleClickEvent = lambda event: self.change_size(event)
         self.status_play_bar(False)
-        # self.horizontallayout.setGeometry(QRect(40, 40, 100, 100))
         QTest.mousePress(self.tab, Qt.LeftButton)
         self.videoWidget.setMouseTracking(True)
-        # self.videoWidget.mouseDoubleClickEvent = lambda event : self.change_size(event)
         self.master.widget.setWindowFlags(
             self.master.widget.windowFlags() & ~Qt.WindowStaysOnTopHint
         )
         self.mythread = GUIThread(self.get_status)
         self.mythread.start()
-        self.mythread.seton.connect(lambda: self.status_play_bar(True))
-        self.mythread.setoff.connect(lambda: self.status_play_bar(False))
-        # self.tab.setGraphicsEffect(QGraphicsOpacityEffect(opacity = 0.5))
-
-        # self.mythread.seton.connect(lambda: self.tab.setGraphicsEffect(QGraphicsOpacityEffect(opacity = 1)))
-        # self.mythread.setoff.connect(lambda: self.tab.setGraphicsEffect(QGraphicsOpacityEffect(opacity = 0.5)))
-        # self.mythread.setoff.connect(lambda: self.tab.accept())
-        # self.mythread.seton.connect(lambda: print("hello"))
-        # self.mythread.setoff.connect(lambda: print("hello2"))
-        self.horizontallayout.setContentsMargins(50, 0, 50, 5)
+        self.mythread.seton.connect(
+            lambda: [
+                self.status_play_bar(True),
+                self.horizontallayout.setContentsMargins(50, 0, 50, 5),
+            ]
+        )
+        self.mythread.setoff.connect(
+            lambda: [
+                self.status_play_bar(False),
+                self.horizontallayout.setContentsMargins(0, 0, 0, 0),
+            ]
+        )
 
     def get_status(self):
         return self.status
@@ -451,6 +424,7 @@ class CustomVideoPlayer:
 
     def change_size2(self, event=None, change_position=True):
         if not event or event.button() == Qt.LeftButton:
+            self.horizontallayout.setContentsMargins(0, 0, 0, 0)
             self.status = Status.SMALL
             self.videoWidget.setCursor(Qt.DragMoveCursor)
             self.videoWidget.mousePressEvent = lambda event: self.func1(event)
@@ -506,18 +480,8 @@ class CustomVideoPlayer:
             self.master.widget.setWindowOpacity(0.6)
 
     def change_size(self, event=None, change_position=True):
-        # self.videoWidget.setFullScreen(True)
         if not event or event.button() == Qt.LeftButton:
-            # self.layout.addWidget(self.videoWidget)
-            # self.videoWidget.setFullScreen(False)
-            # self.videoWidget.hide()
-            # self.videoWidget.showFullScreen()
-            # self.videoWidget.setWindowFlag(Qt.WindowFullScreen)
-            # self.videoWidget.unsetCursor()
-            # self.layout.addWidget(self.videoWidget)
-            # self.mediaPlayer.setVideoOutput(self.videoWidget)
-            # self.videoWidget.show()
-
+            self.horizontallayout.setContentsMargins(0, 0, 0, 0)
             self.status = Status.FULL
             self.videoWidget.mousePressEvent = lambda event: None
             self.videoWidget.mouseReleaseEvent = lambda event: None
@@ -618,6 +582,7 @@ class CustomVideoPlayer:
             )
 
     def open_movie(self, name, play=True):
+        print("hi")
         if name:
             if self.videoWidget.isHidden():
                 self.set_spotife_title(False)
@@ -684,24 +649,27 @@ class CustomVideoPlayer:
 
         if self.__dict__.get("mediaPlayer"):
             self.mediaPlayer.stop()
-            del self.mediaPlayer
         if next_window:
             self.master.set_widget(OpenWindow)
-            del self.master.windows["SpotifyWindow"]
         else:
+            if self.__dict__.get("mediaPlayer"):
+                del self.mediaPlayer
+            del self.master.windows["SpotifyWindow"]
             exit()
         try:
 
             self.global_keys.listener.stop()
         except AttributeError:
             pass
+        finally:
+            self.set_spotife_title(True)
 
     def func_for_exit(self, data, next_window=True):
         MyMsgBox(
             **data,
             Yeah=[
                 QMessageBox.YesRole,
-                lambda: self.exit_func(next_window, next_window=False),
+                lambda: self.exit_func(next_window, next_window=True),
             ],
             Nope=[QMessageBox.NoRole, lambda: None],
         )

@@ -78,7 +78,15 @@ class MySingal(QObject):
 
 class ForLabel:
     def __init__(
-        self, master, index, song, title, author, length, uncheck_function=None
+        self,
+        master,
+        index,
+        song,
+        title,
+        author,
+        length,
+        uncheck_function=None,
+        maximum_height=None,
     ):
         self.signal = MySingal()
         self.tab = master
@@ -126,6 +134,20 @@ class ForLabel:
         self.titleLabel.setObjectName("songs")
         self.timelabel.setObjectName("songs")
         self.indexlabel.setObjectName("songs")
+        if maximum_height:
+            self.indexlabel.setMaximumHeight(maximum_height)
+            self.timelabel.setMaximumHeight(maximum_height)
+            self.authorlabel.setMaximumHeight(maximum_height)
+            self.titleLabel.setMaximumHeight(maximum_height)
+
+    def delete(self):
+        self.indexlabel.deleteLater()
+        self.authorlabel.deleteLater()
+        self.playbutton.button.deleteLater()
+        self.titleLabel.deleteLater()
+        self.indexlabel.deleteLater()
+        self.timelabel.deleteLater()
+        self.layout.deleteLater()
 
     def command(self, title: str):
         self.uncheck_function(self.playbutton)
@@ -138,7 +160,7 @@ class ForLabel:
 
 
 class MySignal6(QObject):
-    signal = pyqtSignal()
+    signal = pyqtSignal(bool)
 
 
 class PanelWithSongs:
@@ -146,8 +168,8 @@ class PanelWithSongs:
         self.main_layout = main_layout
         self.tab = master
         # files = os.listdir("/home/filip/Documents/qt-learning/songs")
-        with open(rf"{os.getcwd()}/json_files/songs.json") as file:
-            data = json.load(file)
+        # with open(rf"{os.getcwd()}/json_files/songs.json") as file:
+        #     data = json.load(file)#to jzkox
         self.all_layouts = []
         self.signal = MySignal6()
         # self.layout = QVBoxLayout()
@@ -164,13 +186,26 @@ class PanelWithSongs:
         self.scroll.setObjectName("songs_layout")
         self.groupbox.setObjectName("songs_layout")
 
-        layout = ForLabel(self.tab, "ID", None, "TITLE", "AUTHOR", "TIME")
+        layout = ForLabel(
+            self.tab, "ID", None, "TITLE", "AUTHOR", "TIME", maximum_height=40
+        )
         layout.layout.setContentsMargins(0, 0, 0, 10)
         self.layout.addLayout(layout.layout, 3)
-        for index, song in enumerate(data):
+
+    def post_init(self, user_login):
+        self.user_login = user_login
+        with open(rf"{os.getcwd()}/json_files/songs.json") as file:
+            data = json.load(file)  # to jzkox
+        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+            data_user = json.load(file)[user_login]
+            data_user = data_user["songs"]
+        for item in self.all_layouts:
+            item.delete()
+        self.all_layouts = []
+        for song in data_user:
             layout = ForLabel(
                 self.tab,
-                index + 1,
+                len(self.all_layouts) + 1,
                 song,
                 data[song]["title"],
                 data[song]["author"],
@@ -179,16 +214,29 @@ class PanelWithSongs:
             )
             self.all_layouts.append(layout)
             self.layout.addLayout(layout.layout, 4)
+        self.signal.signal.emit(True)
+        # for song in data:
+        #     if song in data_user:
+        #         layout = ForLabel(
+        #             self.tab,
+        #             len(self.all_layouts)+1,
+        #             song,
+        #             data[song]["title"],
+        #             data[song]["author"],
+        #             data[song]["length"],
+        #             self.uncheck,
+        #         )
+        #         self.all_layouts.append(layout)
+        #         self.layout.addLayout(layout.layout, 4)
 
     def show(self):
-        with open("json_files/songs.json") as file:
-            data = json.load(file)
+        # with open("json_files/songs.json") as file:
+        #     data = json.load(file)
         # self.main_layout.addLayout(self.layout, 5)
         self.main_layout.addWidget(self.scroll, 5)
         self.scroll.show()
 
     def hide(self):
-        print("chowa")
         self.main_layout.removeWidget(self.scroll)
         self.scroll.hide()
 
@@ -198,11 +246,13 @@ class PanelWithSongs:
                 if lay.playbutton.status != Status.START:
                     lay.playbutton.play_status = Status.START
 
-    def update_list(self):
+    def update_list(
+        self,
+    ):
         with open(rf"{os.getcwd()}/json_files/songs.json") as file:
             data = json.load(file)
         song = list(data.keys())[-1]
-        index = len(list(data.keys()))
+        index = len(self.all_layouts) + 1
         song = song[:-4]
         song = int(song)
         song = f"{song}.mp4"
@@ -217,7 +267,13 @@ class PanelWithSongs:
         )
         self.all_layouts.append(layout)
         self.layout.addLayout(layout.layout, 4)
-        self.signal.signal.emit()
+        # tu musze dorzucic zeby zaktualizowalo
+        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+            data = json.load(file)
+            data[self.user_login]["songs"].append(song)
+        with open(rf"{os.getcwd()}/json_files/file.json", "w") as file:
+            json.dump(data, file)
+        self.signal.signal.emit(True)
 
     def __iter__(self):
         yield from self.all_layouts
@@ -250,21 +306,32 @@ class FirstTab(MyTab):
         self.layout.setContentsMargins(10, 30, 10, 55)
         self.tab.setLayout(self.layout)
         for lay in self.songs_panel:
-            lay.signal.signal.connect(self.videoplayer.open_movie)  # tu jest problem
+            lay.signal.signal.connect(
+                lambda title: self.videoplayer.open_movie(title)
+            )  # tu jest problem
         self.videoplayer.signal.signal.connect(self.function)
         self.songs_panel.signal.signal.connect(self.updatesignalfunction)
 
-    def updatesignalfunction(self):
-        self.songs_panel.all_layouts[-1].signal.signal.connect(
-            self.videoplayer.open_movie
-        )
+    def updatesignalfunction(self, all):
+        if not all:
+            self.songs_panel.all_layouts[-1].signal.signal.connect(
+                self.videoplayer.open_movie
+            )
+            return
+        for panel in self.songs_panel:
+            panel.signal.signal.connect(self.videoplayer.open_movie)
 
-    def function(self, videoname: str, next=True, slider_position=0):
-        videoname = videoname.split("/")[-1]
-        print(slider_position)
+    def function(self, next=True, slider_position=0):
+        # videoname = videoname.split("/")[-1]
         for index, song in enumerate(self.songs_panel):
-            if song.song == videoname:
-
+            # if self.songs_panel.all_layouts[
+            #                 index
+            #             ].playbutton.status ==Status.STOP:
+            #             self.songs_panel.all_layouts[
+            #                 index + 1
+            #             ].playbutton.button.click()
+            #             break
+            if self.songs_panel.all_layouts[index].playbutton.status == Status.STOP:
                 try:
                     if next:
                         self.songs_panel.all_layouts[
@@ -285,6 +352,32 @@ class FirstTab(MyTab):
                         == Status.STOP
                     ):
                         self.songs_panel.all_layouts[index].playbutton.button.click()
+                finally:
+                    break
+
+        # for index, song in enumerate(self.songs_panel):
+        #     if song.song == videoname:
+
+        #         try:
+        #             if next:
+        #                 self.songs_panel.all_layouts[
+        #                     index + 1
+        #                 ].playbutton.button.click()
+        #             else:
+        #                 if slider_position in range(0, 5000):
+        #                     if index - 1 < 0:
+        #                         raise IndexError
+        #                     self.songs_panel.all_layouts[
+        #                         index - 1
+        #                     ].playbutton.button.click()
+        #                 else:
+        #                     self.videoplayer.backward(100)
+        #         except (IndexError, NotImplementedError):
+        #             if (
+        #                 self.songs_panel.all_layouts[index].playbutton.status
+        #                 == Status.STOP
+        #             ):
+        #                 self.songs_panel.all_layouts[index].playbutton.button.click()
 
     def remove_all_items(self):
         self.cancel_button.button.hide()

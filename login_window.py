@@ -121,8 +121,8 @@ class LoginWindow:
             if str(self.login) and str(self.password):
                 with open(rf"{os.getcwd()}/json_files/file.json") as file:
                     data = json.load(file)
-                logins = [person["login"] for person in data]
-                passwords = (person["password"] for person in data)
+                logins = [person for person in data]
+                passwords = (data[person]["password"] for person in data)
                 if str(self.login) in logins:
                     login_index = logins.index(str(self.login))
                     for _ in range(login_index + 1):
@@ -136,7 +136,9 @@ class LoginWindow:
                             **data_message_green,
                             OK=[
                                 QMessageBox.AcceptRole,
-                                lambda: self.master.add_and_set(SpotifyWindow),
+                                lambda: self.master.set_widget(
+                                    SpotifyWindow, str(self.login)
+                                ),  # here
                             ],
                         )
                     else:
