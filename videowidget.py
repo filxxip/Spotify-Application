@@ -227,6 +227,12 @@ class CustomVideoPlayer:
         self.videoWidget.hide()
         self.status_play_bar(False)
 
+    def stopfunction(self, name):
+        if self.video_name:
+            if name == self.video_name.split("/")[-1]:
+                print("zrob sie")
+                self.set_spotife_title()
+
     def autoplay_function(self):
         if self.autoplay:
             self.autoplay = False
@@ -260,6 +266,7 @@ class CustomVideoPlayer:
         self.horizontallayout.addWidget(self.slider, 70)
         self.horizontallayout.addWidget(self.end_time_lbl)
         self.horizontallayout.addWidget(self.size_button.button, 1)
+        # self.horizontallayout.addWidget(self.remmovebutton, 1)
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(20, 0, 20, 0)
         self.layout.addWidget(self.videoWidget)
@@ -310,9 +317,16 @@ class CustomVideoPlayer:
         self.playbutton = QPushButton()
         self.playbutton.setIcon(self.tab.style().standardIcon(QStyle.SP_MediaPlay))
         self.playbutton.clicked.connect(self.play)
+        # self.remmovebutton = QPushButton()
+        removeicon = QIcon(rf"{os.getcwd()}/images/delete.png")
+        # self.remmovebutton.setIcon(removeicon)
+        # self.remmovebutton.setIconSize(QSize(20, 20))
+        # self.remmovebutton.setMaximumSize(20, 20)
+        # self.remmovebutton.clicked.connect(self.play)
         self.soundbutton = QPushButton()
         self.soundbutton.setObjectName("aaa")
         self.playbutton.setObjectName("aaa")
+        # self.remmovebutton.setObjectName("aaa")
         self.soundbutton.setIcon(self.tab.style().standardIcon(QStyle.SP_MediaVolume))
         self.soundbutton.clicked.connect(self.change_sound)
         self.previous_video_button = QPushButton()
@@ -553,6 +567,7 @@ class CustomVideoPlayer:
         self.size_button.button.setVisible(status)
         self.autoplay_button.button.setVisible(status)
         self.global_keys_button.button.setVisible(status)
+        # self.remmovebutton.setVisible(status)
 
     def set_spotife_title(self, status=True):
         if status:
@@ -562,6 +577,7 @@ class CustomVideoPlayer:
             self.label.label.show()
             self.videoWidget.hide()
             self.status_play_bar(False)
+            self.mediaPlayer.stop()
 
         else:
             self.global_keys.LOCAL_KEYS = True
@@ -582,12 +598,12 @@ class CustomVideoPlayer:
             )
 
     def open_movie(self, name, play=True):
-        print("hi")
+        print(name, play)
+        print(self.mediaPlayer.state())
         if name:
             if self.videoWidget.isHidden():
                 self.set_spotife_title(False)
             self.video_name = name
-
             media = QMediaContent(QUrl.fromLocalFile(name))
             self.mediaPlayer.setMedia(media)
             # QTimer.singleShot(20, self.playbutton.click)

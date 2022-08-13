@@ -7,23 +7,16 @@ from PyQt5.QtWidgets import (
     QSizePolicy,
     QScrollArea,
     QGroupBox,
+    QMessageBox,
 )
 
 import json
-
-# import requests
-from youtubesearchpython import VideosSearch
-from components import MyButtonwithImage, MyLabelwithText
+from components import MyButtonwithImage, MyLabelwithText, MyMsgBox
 from PyQt5.QtCore import (
     Qt,
-    QRect,
     QSize,
     pyqtSignal,
     QObject,
-    QUrl,
-    QPropertyAnimation,
-    QPoint,
-    pyqtProperty,
 )
 import os
 from videowidget import CustomVideoPlayer
@@ -76,6 +69,10 @@ class MySingal(QObject):
     signal = pyqtSignal(str)
 
 
+class DeleteSingal(QObject):
+    signal = pyqtSignal(str)
+
+
 class ForLabel:
     def __init__(
         self,
@@ -89,11 +86,12 @@ class ForLabel:
         maximum_height=None,
     ):
         self.signal = MySingal()
+        self.deletesignal = DeleteSingal()
         self.tab = master
         self.song = song
         self.uncheck_function = uncheck_function
         self.titleLabel = QLabel()
-        self.titleLabel.setFixedWidth(400)
+        self.titleLabel.setFixedWidth(350)
         self.titleLabel.setText(title)
         self.titleLabel.setWordWrap(True)
         self.titleLabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -102,13 +100,35 @@ class ForLabel:
         self.authorlabel.setFixedWidth(190)
         self.titleLabel.setWordWrap(True)
         self.timelabel = QLabel()
+        self.remmovebutton = QPushButton()
+        removeicon = QIcon(rf"{os.getcwd()}/images/delete.png")
+        self.remmovebutton.setIcon(removeicon)
+        self.remmovebutton.setIconSize(QSize(33, 33))
+        self.remmovebutton.setMaximumSize(33, 33)
+        self.remmovebutton.clicked.connect(lambda: None)
+        self.remmovebutton.setObjectName("aaa")
+        self.remmovebutton.setCursor(Qt.OpenHandCursor)
+        with open(rf"{os.getcwd()}/json_files/data_main_window.json") as file:
+            data = json.load(file)["removing_video"]
+        self.remmovebutton.clicked.connect(
+            lambda: MyMsgBox(
+                **data,
+                Yeah=[QMessageBox.YesRole, lambda: self.remove_song_function()],
+                Nope=[QMessageBox.NoRole, lambda: None],
+            )
+        )
         if uncheck_function:
             self.playbutton = Play_button()
             self.playbutton.button.clicked.connect(lambda: self.command(song))
-            # self.playbutton.button.clicked.connect(lambda : self.signal.signal.emit(f"/home/filip/Documents/qt-learning/songs/{title}.mp4"))
+
         else:
             self.playbutton = Play_button(image=False)
             self.playbutton.button.clicked.connect(lambda: None)
+            self.remmovebutton.hide()
+            policy = self.remmovebutton.sizePolicy()
+            policy.setRetainSizeWhenHidden(True)
+            self.remmovebutton.setSizePolicy(policy)
+
         if isinstance(length, int):
             minutes = length // 60
             seconds = length % 60
@@ -129,6 +149,7 @@ class ForLabel:
         self.layout.addWidget(self.authorlabel, 30)
         self.layout.addWidget(self.timelabel, 9)
         self.layout.addWidget(self.playbutton.button, 1)
+        self.layout.addWidget(self.remmovebutton, 1)
         self.layout.setObjectName("songs_layout")
         self.authorlabel.setObjectName("songs")
         self.titleLabel.setObjectName("songs")
@@ -140,10 +161,21 @@ class ForLabel:
             self.authorlabel.setMaximumHeight(maximum_height)
             self.titleLabel.setMaximumHeight(maximum_height)
 
+    def remove_song_function(self):
+        with open(rf"{os.getcwd()}/json_files/songs.json") as file:
+            data = json.load(file)
+        data.pop(self.song)
+        with open(rf"{os.getcwd()}/json_files/songs.json", "w") as file:
+            json.dump(data, file)
+        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+            data = json.load(file)
+        self.deletesignal.signal.emit(self.song)
+
     def delete(self):
         self.indexlabel.deleteLater()
         self.authorlabel.deleteLater()
         self.playbutton.button.deleteLater()
+        self.remmovebutton.deleteLater()
         self.titleLabel.deleteLater()
         self.indexlabel.deleteLater()
         self.timelabel.deleteLater()
@@ -163,16 +195,17 @@ class MySignal6(QObject):
     signal = pyqtSignal(bool)
 
 
+class StopSignal(QObject):
+    signal = pyqtSignal(str)
+
+
 class PanelWithSongs:
     def __init__(self, master, main_layout):
         self.main_layout = main_layout
         self.tab = master
-        # files = os.listdir("/home/filip/Documents/qt-learning/songs")
-        # with open(rf"{os.getcwd()}/json_files/songs.json") as file:
-        #     data = json.load(file)#to jzkox
         self.all_layouts = []
         self.signal = MySignal6()
-        # self.layout = QVBoxLayout()
+        self.stopsingal = StopSignal()
         self.layout = QVBoxLayout()
         self.groupbox = QGroupBox()
         self.groupbox.setStyleSheet("QGroupBox{padding-top:18px; margin-top:-18px}")
@@ -192,12 +225,13 @@ class PanelWithSongs:
         layout.layout.setContentsMargins(0, 0, 0, 10)
         self.layout.addLayout(layout.layout, 3)
 
-    def post_init(self, user_login):
-        self.user_login = user_login
+    def post_init(self, user_login=None):
+        if user_login:
+            self.user_login = user_login
         with open(rf"{os.getcwd()}/json_files/songs.json") as file:
             data = json.load(file)  # to jzkox
         with open(rf"{os.getcwd()}/json_files/file.json") as file:
-            data_user = json.load(file)[user_login]
+            data_user = json.load(file)[self.user_login]
             data_user = data_user["songs"]
         for item in self.all_layouts:
             item.delete()
@@ -215,24 +249,22 @@ class PanelWithSongs:
             self.all_layouts.append(layout)
             self.layout.addLayout(layout.layout, 4)
         self.signal.signal.emit(True)
-        # for song in data:
-        #     if song in data_user:
-        #         layout = ForLabel(
-        #             self.tab,
-        #             len(self.all_layouts)+1,
-        #             song,
-        #             data[song]["title"],
-        #             data[song]["author"],
-        #             data[song]["length"],
-        #             self.uncheck,
-        #         )
-        #         self.all_layouts.append(layout)
-        #         self.layout.addLayout(layout.layout, 4)
+        for panel in self.all_layouts:
+            panel.deletesignal.signal.connect(lambda name: self.deletesong(name))
+
+    def deletesong(self, name):
+        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+            data = json.load(file)
+            data[self.user_login]["songs"].remove(name)
+        with open(rf"{os.getcwd()}/json_files/file.json", "w") as file:
+            json.dump(data, file)
+        if os.path.isfile(rf"{os.getcwd()}/songs/{name}"):
+            os.remove(rf"{os.getcwd()}/songs/{name}")
+            self.stopsingal.signal.emit(name)
+        self.post_init()
+
 
     def show(self):
-        # with open("json_files/songs.json") as file:
-        #     data = json.load(file)
-        # self.main_layout.addLayout(self.layout, 5)
         self.main_layout.addWidget(self.scroll, 5)
         self.scroll.show()
 
@@ -246,9 +278,23 @@ class PanelWithSongs:
                 if lay.playbutton.status != Status.START:
                     lay.playbutton.play_status = Status.START
 
-    def update_list(
-        self,
-    ):
+    def update_list(self, a1, a2, a3, a4):
+        with open(rf"{os.getcwd()}/json_files/songs.json") as data:
+            data = json.load(data)
+        try:
+            index = list(data.keys())[-1]
+            index = index[:-4]
+            index = int(index)
+        except:index = 0
+        index += 1
+        data[f"{index}.mp4"] = {
+            "title": a1,
+            "author": a2,
+            "length": a3,
+            "views": a4,
+        }
+        with open(rf"{os.getcwd()}/json_files/songs.json", "w") as file:
+            json.dump(data, file)
         with open(rf"{os.getcwd()}/json_files/songs.json") as file:
             data = json.load(file)
         song = list(data.keys())[-1]
@@ -256,6 +302,7 @@ class PanelWithSongs:
         song = song[:-4]
         song = int(song)
         song = f"{song}.mp4"
+
         layout = ForLabel(
             self.tab,
             index,
@@ -267,13 +314,13 @@ class PanelWithSongs:
         )
         self.all_layouts.append(layout)
         self.layout.addLayout(layout.layout, 4)
-        # tu musze dorzucic zeby zaktualizowalo
         with open(rf"{os.getcwd()}/json_files/file.json") as file:
             data = json.load(file)
             data[self.user_login]["songs"].append(song)
         with open(rf"{os.getcwd()}/json_files/file.json", "w") as file:
             json.dump(data, file)
-        self.signal.signal.emit(True)
+        self.signal.signal.emit(False)
+        layout.deletesignal.signal.connect(lambda name: self.deletesong(name))
 
     def __iter__(self):
         yield from self.all_layouts
@@ -301,6 +348,9 @@ class FirstTab(MyTab):
             **data["cancel_button"],
         )
         self.songs_panel = PanelWithSongs(self.tab, self.layout)
+        self.songs_panel.stopsingal.signal.connect(
+            lambda name: self.videoplayer.stopfunction(name)
+        )
         self.layout.addLayout(self.videoplayer.layout, 5)
         self.layout.addWidget(self.songs_panel.scroll, 5)  # jakos potem go wywalic
         self.layout.setContentsMargins(10, 30, 10, 55)
@@ -322,15 +372,7 @@ class FirstTab(MyTab):
             panel.signal.signal.connect(self.videoplayer.open_movie)
 
     def function(self, next=True, slider_position=0):
-        # videoname = videoname.split("/")[-1]
         for index, song in enumerate(self.songs_panel):
-            # if self.songs_panel.all_layouts[
-            #                 index
-            #             ].playbutton.status ==Status.STOP:
-            #             self.songs_panel.all_layouts[
-            #                 index + 1
-            #             ].playbutton.button.click()
-            #             break
             if self.songs_panel.all_layouts[index].playbutton.status == Status.STOP:
                 try:
                     if next:
@@ -354,30 +396,6 @@ class FirstTab(MyTab):
                         self.songs_panel.all_layouts[index].playbutton.button.click()
                 finally:
                     break
-
-        # for index, song in enumerate(self.songs_panel):
-        #     if song.song == videoname:
-
-        #         try:
-        #             if next:
-        #                 self.songs_panel.all_layouts[
-        #                     index + 1
-        #                 ].playbutton.button.click()
-        #             else:
-        #                 if slider_position in range(0, 5000):
-        #                     if index - 1 < 0:
-        #                         raise IndexError
-        #                     self.songs_panel.all_layouts[
-        #                         index - 1
-        #                     ].playbutton.button.click()
-        #                 else:
-        #                     self.videoplayer.backward(100)
-        #         except (IndexError, NotImplementedError):
-        #             if (
-        #                 self.songs_panel.all_layouts[index].playbutton.status
-        #                 == Status.STOP
-        #             ):
-        #                 self.songs_panel.all_layouts[index].playbutton.button.click()
 
     def remove_all_items(self):
         self.cancel_button.button.hide()

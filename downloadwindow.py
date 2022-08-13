@@ -98,7 +98,7 @@ class SearchResult:
 
         layout.addLayout(self.layout)
 
-    def creation_horizontal_box(self, text, image_link: QPixmap, imagesize=160):
+    def creation_horizontal_box(self, text, image_link: QPixmap, imagesize=80):
         file = open(".file.webp", "wb")
         file.write(urllib.request.urlopen(image_link).read())
         file.close()
@@ -115,9 +115,11 @@ class SearchResult:
         titlelabel.adjustSize()
         # titlelabel.setFixedHeight(30)
         titlelabel.setWordWrap(True)
-        image = image.scaledToWidth(imagesize)
+        image = image.scaledToHeight(imagesize)
         titleimage = QLabel()
         titleimage.setPixmap(image)
+        # titleimage.setMaximumHeight(150)
+        # print(image.width(), image.height())
         titleimage.setFixedSize(image.width(), image.height())
         titleimage.setObjectName("image_with_background2")
         horizontallayout.addWidget(titleimage, 30)
@@ -143,7 +145,7 @@ class SearchResult:
         self.layout.addLayout(horizontallayout, 50)
         return titlelabel, contentlabel
 
-    def update_horizontal_box(self, text, image, textlabel, imagelabel, imagesize=160):
+    def update_horizontal_box(self, text, image, textlabel, imagelabel, imagesize=80):
         file = open(".file.webp", "wb")
         file.write(urllib.request.urlopen(image).read())
         file.close()
@@ -151,7 +153,8 @@ class SearchResult:
         im.save(".file.png", "png")
         image = QPixmap(".file.png")
         textlabel.setText(text)
-        image = image.scaledToWidth(imagesize)
+        image = image.scaledToHeight(imagesize)
+
         imagelabel.setPixmap(image)
         imagelabel.setFixedSize(image.width(), image.height())
 
@@ -493,34 +496,50 @@ class DownloadPanel:
 
 
 class Worker(QThread):
-    finish = pyqtSignal()
+    stash = 0
+    finish = pyqtSignal(str, str, int, int)
     finished = pyqtSignal()
 
-    def __init__(self, entries):
+    def __init__(self, title, author, link):
         # self.signal = MySignal6()
-        self.entries_list = entries
+        self.title = title
+        self.author = author
+        self.link = link
         super().__init__()
 
     def run(self):
+        yt = YouTube(self.link)
+        ys = yt.streams.filter(progressive=True).last()
         with open(rf"{os.getcwd()}/json_files/songs.json") as data:
             data = json.load(data)
-        index = list(data.keys())[-1]
-        index = index[:-4]
-        index = int(index)
-        index += 1
-        link = self.entries_list["entry_link"].getText()
-        yt = YouTube(link)
-        ys = yt.streams.filter(progressive=True).last()
-        data[f"{index}.mp4"] = {
-            "title": self.entries_list["entry_title"].getText(),
-            "author": self.entries_list["entry_author"].getText(),
-            "length": yt.length,
-            "views": yt.views,
-        }
-        with open(rf"{os.getcwd()}/json_files/songs.json", "w") as file:
-            json.dump(data, file)
+        try:
+            index = list(data.keys())[-1]
+            index = index[:-4]
+            index = int(index)
+            # index += 1
+        except:
+            index = 0
+        index += Worker.stash
+        # data[f"{index}.mp4"] = {
+        #     "title": self.entries_list["entry_title"].getText(),
+        #     "author": self.entries_list["entry_author"].getText(),
+        #     "length": yt.length,
+        #     "views": yt.views,
+        # }
+        # with open(rf"{os.getcwd()}/json_files/songs.json", "w") as file:
+        #     json.dump(data, file)
+        import datetime
+
+        x = datetime.datetime.now()
+        print(datetime.datetime.now(), "poczatek ", index)
         ys.download(rf"{os.getcwd()}/songs", filename=str(index) + ".mp4")
-        self.finish.emit()
+        print(datetime.datetime.now(), "koniec ", index, datetime.datetime.now() - x)
+        self.finish.emit(
+            self.title,
+            self.author,
+            yt.length,
+            yt.views,
+        )
         # self.signal.signal.emit()
 
 
@@ -621,13 +640,15 @@ class MyInputMsg(QInputDialog):
 
 
 class MySignal5(QObject):
-    signal = pyqtSignal()
+    signal = pyqtSignal(str, str, int, int)
 
 
 class SecondTab(MyTab):
     def __init__(self, master, window, title, number_of_items):
+        self.x = 10
         super().__init__(master, window, title)
         self.filterlist = FilterList(number_of_items)
+        self.worker = None
         self.entries_list = EntriesList()
         self.signal = MySignal5()
         for searchbox in self.filterlist.searchresults:
@@ -766,22 +787,34 @@ class SecondTab(MyTab):
         policy.setRetainSizeWhenHidden(True)
         self.load_label.setSizePolicy(policy)
 
-    def finished_download_normal(self):
-        self.signal.signal.emit()  # change list
-        self.load_label.setVisible(False)
-        self.movie.stop()
-        self.set_status(True)
+    def finished_download_normal(self, a1, a2, a3, a4):
+        self.signal.signal.emit(a1, a2, a3, a4)  # change list
+        # self.movie.stop()
+        # self.set_status(True)
+        Worker.stash -= 1
+        print(Worker.stash, "hejgo", Worker.stash==0)
+        if Worker.stash==0:
+            print("stopujeeee")
+            self.movie.stop()
+            self.load_label.setVisible(False)
 
-
-        
     def download_normal_command(self):
         def adding_new_song():
-            self.worker = Worker(self.entries_list)
+            Worker.stash += 1
+            if Worker.stash==1:
+                self.movie.start()
+            self.worker = Worker(
+                self.entries_list["entry_title"].getText(),
+                self.entries_list["entry_author"].getText(),
+                self.entries_list["entry_link"].getText(),
+            )
             self.load_label.setVisible(True)
-            self.set_status(False)
-            self.movie.start()
+            # self.set_status(False)
+
             self.worker.start()
-            self.worker.finish.connect(lambda: self.finished_download_normal())
+            self.worker.finish.connect(
+                lambda a1, a2, a3, a4: self.finished_download_normal(a1, a2, a3, a4)
+            )
             # self.worker.finished.connect(lambda: self.signal.signal.emit())
 
         with open("json_files/data_spotify_window.json") as file:

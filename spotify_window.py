@@ -47,13 +47,14 @@ class SpotifyWindow:
         self.tab1 = FirstTab(self.master, self.window, "Player")
         self.tab2 = SecondTab(self.master, self.window, "Downloader", 5)
         # self.window.setCurrentWidget(self.tab2.tab)
-        self.tab2.signal.signal.connect(lambda: self.tab1.songs_panel.update_list())
+        self.tab2.signal.signal.connect(
+            lambda a1, a2, a3, a4: self.tab1.songs_panel.update_list(a1, a2, a3, a4)
+        )
         # self.tab2.worker.signal.signal.connect(self.tab1.songs_panel.update_list)
         # self.tab3 = MyTab(self.master, self.window, "tab3")
         # self.tab4 = MyTab(self.master, self.window, "tab4")
 
     def post_init(self, *args):
-        print("hello", args)
         self.tab1.songs_panel.post_init(*args)
 
     @property

@@ -85,5 +85,11 @@
         "icon": "images/spotifyimg.png",
         "name": "messagebox_green",
         "text": "CTRL-left + < + RIGHT ARROW -> pass few seconds\nCTRL-left + < + LEFT ARROW -> return few seconds\nCTRL-left + < +UP ARROW -> sound up\nCTRL-left + < + DOWN ARROW -> sound down\nCTRL-left + < + SPACE -> pause and play\nCTRL-left + < + z + RIGHT ARROW -> next song\nCTRL-left + < + z + LEFT ARROW -> previous song"
+    },
+    "removing_video": {
+        "title": "Removing video",
+        "icon": "images/spotifyimg.png",
+        "text": "Are you sure to remove this video from data?",
+        "name": "messagebox_red"
     }
 }
