@@ -1,13 +1,14 @@
 from ast import Load
-from open_window import OpenWindow
-from singleton import Singleton
+from .open_window import OpenWindow
+from .singleton import Singleton
 from PyQt5.QtWidgets import QStackedWidget, QMainWindow, QDialog, QLabel
 from PyQt5 import QtCore
+from pathlib import Path
 
 
 class BaseForAll(metaclass=Singleton):
     def __init__(self, master, title, styling, starting_window):
-        from spotify_window import SpotifyWindow
+        from .spotify_window import SpotifyWindow
 
         self.master = master
         master.setStyleSheet(open(styling).read())

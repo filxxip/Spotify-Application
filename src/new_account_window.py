@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import (
     QDialog,
 )
 import json
-
-from components import (
+from pathlib import Path
+from .components import (
     Label_Entry_Box_Age,
     Label_Entry_Box_Country,
     Label_Entry_Box_Gender,
@@ -20,7 +20,8 @@ from components import (
     MyMsgBox,
     Mybuttonwithtext,
 )
-from blocking_decorator import blocked_button
+from .blocking_decorator import blocked_button
+import __main__
 
 
 class New_Account_Window:
@@ -30,7 +31,9 @@ class New_Account_Window:
         self.master = master
         self.window = QDialog()
         self.window.eventFilter = self.eventFilter
-        with open(rf"{os.getcwd()}/json_files/new_account_window.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/new_account_window.json"
+        ) as file:
             data = json.load(file)
         self.exit_button = MyButtonwithImage(
             self.window,
@@ -111,7 +114,9 @@ class New_Account_Window:
         self.change_state(*args)
 
     def create_new_user(self):
-        with open(rf"{os.getcwd()}/json_files/new_account_window.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/new_account_window.json"
+        ) as file:
             data = json.load(file)["messagebox_new_account"]
         from open_window import OpenWindow
 
@@ -119,7 +124,9 @@ class New_Account_Window:
             **data,
             Great=[QMessageBox.YesRole, lambda: self.master.set_widget(OpenWindow)],
         )
-        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/file.json"
+        ) as file:
             data = json.load(file)
         data[self.postioning_entry_login.__str__()] = {
             "name": self.postioning_entry_name.__str__(),
@@ -131,7 +138,9 @@ class New_Account_Window:
             "gender": self.postioning_entry_gender.__str__(),
             "songs": [],
         }
-        with open(rf"{os.getcwd()}/json_files/file.json", "w") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/file.json", "w"
+        ) as file:
             json.dump(data, file)
 
     def change_state(self, *widgets):
@@ -152,7 +161,9 @@ class New_Account_Window:
             if state:
                 self.create_new_user()
             else:
-                with open(rf"{os.getcwd()}/json_files/new_account_window.json") as file:
+                with open(
+                    rf"{Path(__main__.__file__).parent.__str__()}/json_files/new_account_window.json"
+                ) as file:
                     data = json.load(file)
                 text = ""
                 for index, cls in enumerate(incorrects):

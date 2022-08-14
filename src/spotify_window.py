@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
     QWidget,
     QLineEdit,
 )
+from pathlib import Path
 import urllib3.request
 import urllib.request
 
@@ -25,14 +26,14 @@ import json
 # import requests
 from PIL import Image, ImageQt
 from io import BytesIO
-from base_component import BaseForAll
-from components import MyButtonwithImage, MyLabelwithText
+from .base_component import BaseForAll
+from .components import MyButtonwithImage, MyLabelwithText
 from PyQt5.QtCore import Qt, QRect, QSize, pyqtSignal, QObject, QUrl
 import os
-from videowidget import CustomVideoPlayer
+from .videowidget import CustomVideoPlayer
 from PyQt5.QtGui import QPixmap, QIcon, QImage
-from firstwindow import FirstTab
-from downloadwindow import SecondTab
+from .firstwindow import FirstTab
+from .downloadwindow import SecondTab
 
 
 class SpotifyWindow:

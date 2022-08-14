@@ -1,4 +1,5 @@
 from email import message
+from pathlib import Path
 import json
 import os
 import time
@@ -39,8 +40,9 @@ from PyQt5.QtCore import (
     QDir,
 )
 from PyQt5.QtGui import QPixmap, QIcon, QImage, QMovie, QWheelEvent
-from components import MyLabelwithImage, MyMsgBox
+from .components import MyLabelwithImage, MyMsgBox
 from PyQt5.QtTest import QTest
+import __main__
 
 
 class MySingal(QObject):
@@ -99,10 +101,12 @@ class SearchResult:
         layout.addLayout(self.layout)
 
     def creation_horizontal_box(self, text, image_link: QPixmap, imagesize=80):
-        file = open(".file.webp", "wb")
+        file = open(f"{Path(__main__.__file__).parent.__str__()}/.file.webp", "wb")
         file.write(urllib.request.urlopen(image_link).read())
         file.close()
-        im = Image.open(".file.webp").convert("RGB")
+        im = Image.open(
+            f"{Path(__main__.__file__).parent.__str__()}/.file.webp"
+        ).convert("RGB")
         im.save(".file.png", "png")
         image = QPixmap(".file.png")
         horizontallayout = QHBoxLayout()
@@ -146,10 +150,12 @@ class SearchResult:
         return titlelabel, contentlabel
 
     def update_horizontal_box(self, text, image, textlabel, imagelabel, imagesize=80):
-        file = open(".file.webp", "wb")
+        file = open(f"{Path(__main__.__file__).parent.__str__()}/.file.webp", "wb")
         file.write(urllib.request.urlopen(image).read())
         file.close()
-        im = Image.open(".file.webp").convert("RGB")
+        im = Image.open(
+            f"{Path(__main__.__file__).parent.__str__()}/.file.webp"
+        ).convert("RGB")
         im.save(".file.png", "png")
         image = QPixmap(".file.png")
         textlabel.setText(text)
@@ -195,7 +201,7 @@ class SearchResult:
         self.download_button.setEnabled(status)
 
 
-from base_tab import MyTab
+from .base_tab import MyTab
 
 
 class MyQLineEdit(QLineEdit):
@@ -250,7 +256,9 @@ class EntriesList:
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.wheelEvent = lambda event: None
         self.entries = {}
-        with open("json_files/data_spotify_window.json") as file:
+        with open(
+            f"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
+        ) as file:
             data = json.load(file)
         names = (
             "entry_title",
@@ -510,7 +518,9 @@ class Worker(QThread):
     def run(self):
         yt = YouTube(self.link)
         ys = yt.streams.filter(progressive=True).last()
-        with open(rf"{os.getcwd()}/json_files/songs.json") as data:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/songs.json"
+        ) as data:
             data = json.load(data)
         try:
             index = list(data.keys())[-1]
@@ -532,7 +542,10 @@ class Worker(QThread):
 
         x = datetime.datetime.now()
         print(datetime.datetime.now(), "poczatek ", index)
-        ys.download(rf"{os.getcwd()}/songs", filename=str(index) + ".mp4")
+        ys.download(
+            rf"{Path(__main__.__file__).parent.__str__()}/songs",
+            filename=str(index) + ".mp4",
+        )
         print(datetime.datetime.now(), "koniec ", index, datetime.datetime.now() - x)
         self.finish.emit(
             self.title,
@@ -660,7 +673,9 @@ class SecondTab(MyTab):
         self.filterlist.scroll.setVisible(False)
         self.layout.addWidget(self.entries_list.scroll, 6)
         self.layout.setContentsMargins(10, 10, 10, 15)
-        with open("json_files/data_spotify_window.json") as file:
+        with open(
+            f"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
+        ) as file:
             data = json.load(file)
         self.new_song_entry = EntryWithLabelSearchedBoxAndSpinBox(
             self.layout, **data["searched_box"]
@@ -692,7 +707,9 @@ class SecondTab(MyTab):
         self.create_movie()
 
     def creation_label(self):
-        with open(rf"{os.getcwd()}/json_files/data_spotify_window.json") as data:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
+        ) as data:
             data = json.load(data)
         self.label = MyLabelwithImage(self.tab, **data["label"])
         self.label.label.setContentsMargins(20, 0, 20, 20)
@@ -743,7 +760,9 @@ class SecondTab(MyTab):
                 self.entries_list[entry].setText(kwargs[entry])
 
         if difference:
-            with open("json_files/data_spotify_window.json") as file:
+            with open(
+                f"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
+            ) as file:
                 data = json.load(file)
                 data = data["new_data_button"]
             MyMsgBox(
@@ -779,7 +798,9 @@ class SecondTab(MyTab):
         self.load_label = QLabel(self.tab)
         self.load_label.setFixedSize(QSize(30, 30))
         self.download_panel.layout.addWidget(self.load_label)
-        self.movie = QMovie("loading.gif")
+        self.movie = QMovie(
+            f"{Path(__main__.__file__).parent.__str__()}/src/loading.gif"
+        )
         self.movie.setScaledSize(QSize(30, 30))
         self.load_label.setMovie(self.movie)
         self.load_label.setVisible(False)
@@ -792,8 +813,8 @@ class SecondTab(MyTab):
         # self.movie.stop()
         # self.set_status(True)
         Worker.stash -= 1
-        print(Worker.stash, "hejgo", Worker.stash==0)
-        if Worker.stash==0:
+        print(Worker.stash, "hejgo", Worker.stash == 0)
+        if Worker.stash == 0:
             print("stopujeeee")
             self.movie.stop()
             self.load_label.setVisible(False)
@@ -801,7 +822,7 @@ class SecondTab(MyTab):
     def download_normal_command(self):
         def adding_new_song():
             Worker.stash += 1
-            if Worker.stash==1:
+            if Worker.stash == 1:
                 self.movie.start()
             self.worker = Worker(
                 self.entries_list["entry_title"].getText(),
@@ -817,7 +838,9 @@ class SecondTab(MyTab):
             )
             # self.worker.finished.connect(lambda: self.signal.signal.emit())
 
-        with open("json_files/data_spotify_window.json") as file:
+        with open(
+            f"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
+        ) as file:
             data = json.load(file)
         MyMsgBox(
             **data["msgbox_add_song_local"],
@@ -827,7 +850,9 @@ class SecondTab(MyTab):
 
     def download_to_file(self):
         self.set_status(False)
-        with open("json_files/data_spotify_window.json") as file:
+        with open(
+            f"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
+        ) as file:
             data = json.load(file)
         namefile = self.entries_list["entry_title"].getText()
         while " " in namefile:

@@ -1,13 +1,15 @@
 import os
 from PyQt5.QtWidgets import QDialog, QMessageBox
 import json
-from components import (
+from .components import (
     MyButtonwithImage,
     MyLabelwithImage,
     MyLabelwithText,
     MyMsgBox,
 )
+from pathlib import Path
 from PyQt5.QtCore import Qt, QSize, QEvent, QTimer
+import __main__
 
 # from login_window import LoginWindow
 # from new_account_window import New_Account_Window
@@ -15,13 +17,15 @@ class OpenWindow:
     dimensions = (500, 500)
 
     def __init__(self, master):
-        from login_window import LoginWindow
-        from new_account_window import New_Account_Window
+        from .login_window import LoginWindow
+        from .new_account_window import New_Account_Window
 
         self.master = master
         self.window = QDialog()
         self.window.eventFilter = self.eventFilter
-        with open(rf"{os.getcwd()}/json_files/data_second_window.json") as data:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/data_second_window.json"
+        ) as data:
             data = json.load(data)
         self.title_label = MyLabelwithImage(self.window, **data["title_label"])
         self.exit_button = MyButtonwithImage(

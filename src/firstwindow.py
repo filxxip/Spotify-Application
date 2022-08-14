@@ -9,9 +9,9 @@ from PyQt5.QtWidgets import (
     QGroupBox,
     QMessageBox,
 )
-
+from pathlib import Path
 import json
-from components import MyButtonwithImage, MyLabelwithText, MyMsgBox
+from .components import MyButtonwithImage, MyLabelwithText, MyMsgBox
 from PyQt5.QtCore import (
     Qt,
     QSize,
@@ -19,9 +19,11 @@ from PyQt5.QtCore import (
     QObject,
 )
 import os
-from videowidget import CustomVideoPlayer
+from .videowidget import CustomVideoPlayer
 from PyQt5.QtGui import QPixmap, QIcon, QImage, QColor
-from base_tab import MyTab
+from .base_tab import MyTab
+import __main__
+from pathlib import Path
 
 
 class Status(enum.Enum):
@@ -37,12 +39,18 @@ class Play_button:
         self.button.setIconSize(QSize(30, 30))
         self.button.setObjectName("play_stop_button")
         if image:
-            self.image1 = QIcon(rf"{os.getcwd()}/images/play.png")
-            self.image2 = QIcon(rf"{os.getcwd()}/images/stop.png")
+            self.image1 = QIcon(
+                rf"{Path(__main__.__file__).parent.__str__()}/images/play.png"
+            )
+            self.image2 = QIcon(
+                rf"{Path(__main__.__file__).parent.__str__()}/images/stop.png"
+            )
             self.button.setCursor(Qt.OpenHandCursor)
             self.set_icon()
         else:
-            self.image1 = QIcon(rf"{os.getcwd()}/images/empty.png")
+            self.image1 = QIcon(
+                rf"{Path(__main__.__file__).parent.__str__()}/images/empty.png"
+            )
             self.button.setIcon(self.image1)
 
     def set_icon(self):
@@ -101,14 +109,18 @@ class ForLabel:
         self.titleLabel.setWordWrap(True)
         self.timelabel = QLabel()
         self.remmovebutton = QPushButton()
-        removeicon = QIcon(rf"{os.getcwd()}/images/delete.png")
+        removeicon = QIcon(
+            rf"{Path(__main__.__file__).parent.__str__()}/images/delete.png"
+        )
         self.remmovebutton.setIcon(removeicon)
         self.remmovebutton.setIconSize(QSize(33, 33))
         self.remmovebutton.setMaximumSize(33, 33)
         self.remmovebutton.clicked.connect(lambda: None)
         self.remmovebutton.setObjectName("aaa")
         self.remmovebutton.setCursor(Qt.OpenHandCursor)
-        with open(rf"{os.getcwd()}/json_files/data_main_window.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/data_main_window.json"
+        ) as file:
             data = json.load(file)["removing_video"]
         self.remmovebutton.clicked.connect(
             lambda: MyMsgBox(
@@ -162,12 +174,18 @@ class ForLabel:
             self.titleLabel.setMaximumHeight(maximum_height)
 
     def remove_song_function(self):
-        with open(rf"{os.getcwd()}/json_files/songs.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/songs.json"
+        ) as file:
             data = json.load(file)
         data.pop(self.song)
-        with open(rf"{os.getcwd()}/json_files/songs.json", "w") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/songs.json", "w"
+        ) as file:
             json.dump(data, file)
-        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/file.json"
+        ) as file:
             data = json.load(file)
         self.deletesignal.signal.emit(self.song)
 
@@ -184,7 +202,14 @@ class ForLabel:
     def command(self, title: str):
         self.uncheck_function(self.playbutton)
         if self.playbutton.play_status == Status.START:
-            self.signal.signal.emit(rf"{os.getcwd()}/songs/{title}")
+            print(
+                rf"{Path(__main__.__file__).absolute().parent.__str__()}/songs/{title}",
+                f"{os.getcwd()}/songs/{title}",
+                sep="\n",
+            )
+            self.signal.signal.emit(
+                rf"{Path(__main__.__file__).absolute().parent.__str__()}/songs/{title}"
+            )
             self.playbutton.play_status = Status.STOP
         else:
             self.playbutton.play_status = Status.START
@@ -228,9 +253,13 @@ class PanelWithSongs:
     def post_init(self, user_login=None):
         if user_login:
             self.user_login = user_login
-        with open(rf"{os.getcwd()}/json_files/songs.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/songs.json"
+        ) as file:
             data = json.load(file)  # to jzkox
-        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/file.json"
+        ) as file:
             data_user = json.load(file)[self.user_login]
             data_user = data_user["songs"]
         for item in self.all_layouts:
@@ -253,16 +282,19 @@ class PanelWithSongs:
             panel.deletesignal.signal.connect(lambda name: self.deletesong(name))
 
     def deletesong(self, name):
-        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/file.json"
+        ) as file:
             data = json.load(file)
             data[self.user_login]["songs"].remove(name)
-        with open(rf"{os.getcwd()}/json_files/file.json", "w") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/file.json", "w"
+        ) as file:
             json.dump(data, file)
-        if os.path.isfile(rf"{os.getcwd()}/songs/{name}"):
-            os.remove(rf"{os.getcwd()}/songs/{name}")
+        if os.path.isfile(rf"{Path(__main__.__file__).parent.__str__()}/songs/{name}"):
+            os.remove(rf"{Path(__main__.__file__).parent.__str__()}/songs/{name}")
             self.stopsingal.signal.emit(name)
         self.post_init()
-
 
     def show(self):
         self.main_layout.addWidget(self.scroll, 5)
@@ -279,13 +311,16 @@ class PanelWithSongs:
                     lay.playbutton.play_status = Status.START
 
     def update_list(self, a1, a2, a3, a4):
-        with open(rf"{os.getcwd()}/json_files/songs.json") as data:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/songs.json"
+        ) as data:
             data = json.load(data)
         try:
             index = list(data.keys())[-1]
             index = index[:-4]
             index = int(index)
-        except:index = 0
+        except:
+            index = 0
         index += 1
         data[f"{index}.mp4"] = {
             "title": a1,
@@ -293,9 +328,13 @@ class PanelWithSongs:
             "length": a3,
             "views": a4,
         }
-        with open(rf"{os.getcwd()}/json_files/songs.json", "w") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/songs.json", "w"
+        ) as file:
             json.dump(data, file)
-        with open(rf"{os.getcwd()}/json_files/songs.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/songs.json"
+        ) as file:
             data = json.load(file)
         song = list(data.keys())[-1]
         index = len(self.all_layouts) + 1
@@ -314,10 +353,14 @@ class PanelWithSongs:
         )
         self.all_layouts.append(layout)
         self.layout.addLayout(layout.layout, 4)
-        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/file.json"
+        ) as file:
             data = json.load(file)
             data[self.user_login]["songs"].append(song)
-        with open(rf"{os.getcwd()}/json_files/file.json", "w") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/file.json", "w"
+        ) as file:
             json.dump(data, file)
         self.signal.signal.emit(False)
         layout.deletesignal.signal.connect(lambda name: self.deletesong(name))
@@ -329,7 +372,9 @@ class PanelWithSongs:
 class FirstTab(MyTab):
     def __init__(self, master, window, title):
         super().__init__(master, window, title)
-        with open(rf"{os.getcwd()}/json_files/data_spotify_window.json") as data:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
+        ) as data:
             data = json.load(data)
         self.layout = QVBoxLayout()
         self.videoplayer = CustomVideoPlayer(

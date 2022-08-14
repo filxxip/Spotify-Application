@@ -17,7 +17,7 @@ import pyautogui
 import json
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-from components import MyButtonwithImage, MyLabelwithImage, MyMsgBox
+from .components import MyButtonwithImage, MyLabelwithImage, MyMsgBox
 from PyQt5.QtCore import (
     Qt,
     QUrl,
@@ -31,7 +31,7 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtGui import QIcon, QCursor
 import cv2
-from shortcuts import GlobalKeys
+from .shortcuts import GlobalKeys
 from PyQt5.QtTest import QTest
 
 
@@ -45,14 +45,17 @@ class MySingal(QObject):
     signal = pyqtSignal(bool, int)
 
 
+import __main__
+
+
 class ImageChangableButton:
     def __init__(self, image1, image2, function, current_status, size=(30, 30)):
         self.signal = MySingal()
         self.button = QPushButton()
         self.func = function
         self.button.setIconSize(QSize(*size))
-        self.image1 = QIcon(image1)
-        self.image2 = QIcon(image2)
+        self.image1 = QIcon(f"{Path(__main__.__file__).parent.__str__()}/{image1}")
+        self.image2 = QIcon(f"{Path(__main__.__file__).parent.__str__()}/{image2}")
         self.button.setCursor(Qt.OpenHandCursor)
         if current_status:
             self.setIcon(self.image2)
@@ -175,13 +178,18 @@ class CustomizeButtonWithImage(MyButtonwithImage):
             name2,
             image2,
         )
-        self.allimages = [QIcon(image)]
+        self.allimages = [QIcon(f"{Path(__main__.__file__).parent.__str__()}/{image}")]
         for image in restimages.values():
-            self.allimages.append(QIcon(image))
+            self.allimages.append(
+                QIcon(f"{Path(__main__.__file__).parent.__str__()}/{image}")
+            )
         self.button.setIcon(self.allimages[0])
 
     def change_state(self, index):
         self.button.setIcon(self.allimages[index])
+
+
+from pathlib import Path
 
 
 class CustomVideoPlayer:
@@ -198,7 +206,9 @@ class CustomVideoPlayer:
         self.see_func = seeing_function
         self.tab: QDialog = tab
         self.main_layout = layout
-        with open(rf"{os.getcwd()}/json_files/data_spotify_window.json") as data:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
+        ) as data:
             data = json.load(data)
         self.master.widget.closeEvent = lambda event: self.exit_func(event)
         self.label = MyLabelwithImage(self.tab, **data["label"])
@@ -306,7 +316,9 @@ class CustomVideoPlayer:
             pass
 
     def creation_of_layout(self):
-        with open(rf"{os.getcwd()}/json_files/data_spotify_window.json") as data:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
+        ) as data:
             data = json.load(data)
         self.size_button = CustomizeButtonWithImage(
             self.tab,
@@ -318,7 +330,7 @@ class CustomVideoPlayer:
         self.playbutton.setIcon(self.tab.style().standardIcon(QStyle.SP_MediaPlay))
         self.playbutton.clicked.connect(self.play)
         # self.remmovebutton = QPushButton()
-        removeicon = QIcon(rf"{os.getcwd()}/images/delete.png")
+        # removeicon = QIcon(rf"{Path(__main__.__file__).parent.__str__()}/images/delete.png")
         # self.remmovebutton.setIcon(removeicon)
         # self.remmovebutton.setIconSize(QSize(20, 20))
         # self.remmovebutton.setMaximumSize(20, 20)
@@ -604,7 +616,7 @@ class CustomVideoPlayer:
             if self.videoWidget.isHidden():
                 self.set_spotife_title(False)
             self.video_name = name
-            media = QMediaContent(QUrl.fromLocalFile(name))
+            media = QMediaContent(QUrl.fromLocalFile(f"{name}"))
             self.mediaPlayer.setMedia(media)
             # QTimer.singleShot(20, self.playbutton.click)
             # if self.status == Status.SMALL:
@@ -661,7 +673,7 @@ class CustomVideoPlayer:
             )
 
     def exit_func(self, event=None, next_window=False):
-        from open_window import OpenWindow
+        from .open_window import OpenWindow
 
         if self.__dict__.get("mediaPlayer"):
             self.mediaPlayer.stop()

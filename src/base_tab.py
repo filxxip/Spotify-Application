@@ -2,8 +2,9 @@ from PyQt5.QtWidgets import (
     QDialog,
     QTabWidget,
 )
-from base_component import BaseForAll
+from .base_component import BaseForAll
 from PyQt5.QtCore import Qt
+from pathlib import Path
 
 
 class MyTab:

@@ -1,7 +1,7 @@
 import json
 import os
 from enum import Enum
-
+from pathlib import Path
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QCursor, QIcon, QPixmap
 from PyQt5.QtWidgets import QCheckBox, QLabel, QLineEdit, QMessageBox, QPushButton
@@ -12,10 +12,14 @@ class Widget_index(Enum):
     SECOND: 1
 
 
+import __main__
+
+
 class MyError(Exception):
     def __init__(self, text):
-
-        with open(rf"{os.getcwd()}/json_files/data_main_window.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/data_main_window.json"
+        ) as file:
             data = json.load(file)["messagebox_red"]
         MyMsgBox(
             text=f"Logged in failed, {text}",
@@ -111,11 +115,13 @@ class MyLabelwithImage(MyLabel):
 
     def setting_images(self, master, width, image, image2, name2):
         if image:
-            self.pixmap1 = QPixmap(image)
+            self.pixmap1 = QPixmap(
+                f"{Path(__main__.__file__).parent.__str__()}/{image}"
+            )
             self.pixmap1 = self.pixmap1.scaledToWidth(width)
             self.label.setPixmap(self.pixmap1)
         if image2:
-            self.pixmap2 = QIcon(image2)
+            self.pixmap2 = QIcon(f"{Path(__main__.__file__).parent.__str__()}/{image}")
             # self.name2 = name2
             self.hover = False
             self.label.installEventFilter(master)
@@ -230,10 +236,10 @@ class MyButtonwithImage(MyButton):
         if image:
             self.button.setIconSize(QSize(width, height))
 
-            self.icon1 = QIcon(image)
+            self.icon1 = QIcon(f"{Path(__main__.__file__).parent.__str__()}/{image}")
             self.button.setIcon(self.icon1)
         if image2:
-            self.icon2 = QIcon(image2)
+            self.icon2 = QIcon(f"{Path(__main__.__file__).parent.__str__()}/{image2}")
             # self.name2 = name2
             self.hover = False
             self.button.installEventFilter(master)
@@ -431,7 +437,9 @@ class Label_Entry_Box_Login(Label_Entry_Box):
     def check(
         self,
     ) -> bool:
-        with open(rf"{os.getcwd()}/json_files/file.json") as file:
+        with open(
+            rf"{Path(__main__.__file__).parent.__str__()}/json_files/file.json"
+        ) as file:
             file = json.load(file)
             data = [log for log in file]
         return False if self.__str__() in data or not self.__str__() else True
@@ -520,7 +528,11 @@ class MyMsgBox:
         self.message.setWindowTitle(title)
         self.message.setText(text)
         self.message.setObjectName(name)
-        self.message.setIconPixmap(QPixmap(icon).scaledToWidth(40))
+        self.message.setIconPixmap(
+            QPixmap(f"{Path(__main__.__file__).parent.__str__()}/{icon}").scaledToWidth(
+                40
+            )
+        )
 
     def adding_buttons(self, options):
         for item in options.keys():

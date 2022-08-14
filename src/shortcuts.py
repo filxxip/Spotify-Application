@@ -1,13 +1,15 @@
 import json
 from PyQt5.QtWidgets import QPushButton, QShortcut, QMessageBox
 from pynput import keyboard
-from components import MyMsgBox
+from .components import MyMsgBox
 
 import pyautogui
 from PyQt5.QtCore import Qt, QUrl, QTime, QDir, QTimer
 from PyQt5.QtGui import QIcon, QKeySequence, QCursor
 import cv2
 import os
+
+from pathlib import Path
 
 
 class GlobalKeys:
@@ -123,7 +125,11 @@ class GlobalKeys:
             if not self.GLOBAL_KEYS and self.LOCAL_KEYS
             else None
         )
-        with open("json_files/data_main_window.json") as file:
+        import __main__
+
+        with open(
+            f"{Path(__main__.__file__).parent.__str__()}/json_files/data_main_window.json"
+        ) as file:
             data2 = json.load(file)
         shortcut = QShortcut(QKeySequence(Qt.Key_I), self.tab)
         shortcut.activated.connect(
