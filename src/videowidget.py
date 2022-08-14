@@ -191,12 +191,14 @@ class CustomizeButtonWithImage(MyButtonwithImage):
 
 from pathlib import Path
 
-
+class CloseSignal(QObject):
+    signal = pyqtSignal()
 class CustomVideoPlayer:
     marg = 10, 30, 10, 55
 
     def __init__(self, master, window, tab, removing_function, seeing_function, layout):
         self.video_name = None
+        self.closesignal = CloseSignal()
         self.autoplay = True
         self.status = Status.FULL
         self.signal = MySingal()
@@ -691,6 +693,7 @@ class CustomVideoPlayer:
             pass
         finally:
             self.set_spotife_title(True)
+            self.closesignal.signal.emit()
 
     def func_for_exit(self, data, next_window=True):
         MyMsgBox(

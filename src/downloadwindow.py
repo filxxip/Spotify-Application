@@ -293,9 +293,8 @@ class EntriesList:
 
         def back_color(*args):
             for entry in args:
-                if not self.entries[entry]:
-                    self.entries[entry].entry.setObjectName(self.entries[entry].name1)
-                    self.entries[entry].entry.style().polish(self.entries[entry].entry)
+                self.entries[entry].entry.setObjectName(self.entries[entry].name1)
+                self.entries[entry].entry.style().polish(self.entries[entry].entry)
 
         check_color(*args)
         QTimer.singleShot(1000, lambda: back_color(*args))
@@ -768,7 +767,7 @@ class SecondTab(MyTab):
             MyMsgBox(
                 **data,
                 Yeah=[QMessageBox.YesRole, setting],
-                Nope=[QMessageBox.NoRole, lambda: None],
+                Nope=[QMessageBox.NoRole, lambda: None],#here is cos
             )
             return
         setting()
@@ -925,3 +924,9 @@ class SecondTab(MyTab):
         self.download_panel.set_status(status)
         self.filterlist.set_status(status)
         self.entries_list.set_status(status)
+    def clear(self):
+        # self.filterlist.scroll.setVisible(False)
+        self.set_spotify(True)
+
+        for entry in self.entries_list.entries:
+            self.entries_list[entry].setText("")
