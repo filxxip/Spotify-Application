@@ -54,7 +54,8 @@ class SpotifyWindow:
         # self.tab2.worker.signal.signal.connect(self.tab1.songs_panel.update_list)
         # self.tab3 = MyTab(self.master, self.window, "tab3")
         # self.tab4 = MyTab(self.master, self.window, "tab4")
-        self.tab1.videoplayer.closesignal.signal.connect(lambda : self.tab2.clear())
+        self.tab1.videoplayer.closesignal.signal.connect(lambda: self.tab2.clear())
+
     def post_init(self, *args):
         self.tab1.songs_panel.post_init(*args)
 

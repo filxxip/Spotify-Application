@@ -191,8 +191,11 @@ class CustomizeButtonWithImage(MyButtonwithImage):
 
 from pathlib import Path
 
+
 class CloseSignal(QObject):
     signal = pyqtSignal()
+
+
 class CustomVideoPlayer:
     marg = 10, 30, 10, 55
 

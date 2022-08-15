@@ -540,12 +540,12 @@ class Worker(QThread):
         import datetime
 
         x = datetime.datetime.now()
-        print(datetime.datetime.now(), "poczatek ", index)
+        # print(datetime.datetime.now(), "poczatek ", index)
         ys.download(
             rf"{Path(__main__.__file__).parent.__str__()}/songs",
             filename=str(index) + ".mp4",
         )
-        print(datetime.datetime.now(), "koniec ", index, datetime.datetime.now() - x)
+        # print(datetime.datetime.now(), "koniec ", index, datetime.datetime.now() - x)
         self.finish.emit(
             self.title,
             self.author,
@@ -558,24 +558,48 @@ class Worker(QThread):
 class Worker2(QThread):
     progress = pyqtSignal()
     task = pyqtSignal()
+    finish = pyqtSignal()
+    stash = 0
 
     def __init__(self, entries, path, directory_name, file_name):
         self.entries_list = entries
+        # Worker2.stash += 1
         self.path = path
         self.directory_name = directory_name
         self.file_name = file_name
         super().__init__()
+        names = (
+            "entry_title",
+            "entry_author",
+            "entry_published_time",
+            "entry_duration",
+            "entry_link",
+            "entry_views",
+        )
 
     def run(self):
+        link = self.entries_list["entry_link"].getText()
         if self.directory_name:
             self.path += f"/{self.directory_name}"
-            os.mkdir(self.path)
-        link = self.entries_list["entry_link"].getText()
-        # name = self.entries_list["entry_title"].getText()
+            while True:
+                try:
+                    os.mkdir(self.path)
+                    break
+                except FileExistsError:
+                    self.path += "_"
+            with open(f"{self.path}/{self.file_name}_data", "x") as file:
+                title = self.entries_list["entry_title"].getText()
+                author = self.entries_list["entry_author"].getText()
+                time = self.entries_list["entry_published_time"].getText()
+                duration = self.entries_list["entry_duration"].getText()
+                views = self.entries_list["entry_views"].getText()
+                file.write(
+                    f"Title of file: {title}\nAuthor of file: {author}\nPublished time of video: {time}\nDuration time: {duration}\nYoutube link: {link}\nViews: {views}\n\nDownloaded by filxxip SPOTIFY app."
+                )
         yt = YouTube(link)
         ys = yt.streams.filter(progressive=True).last()
         ys.download(self.path, filename=self.file_name + ".mp4")
-
+        self.finish.emit()
 
 class MyInputMsg(QInputDialog):
     def __init__(self, master, window_title, window_name, args):
@@ -767,7 +791,7 @@ class SecondTab(MyTab):
             MyMsgBox(
                 **data,
                 Yeah=[QMessageBox.YesRole, setting],
-                Nope=[QMessageBox.NoRole, lambda: None],#here is cos
+                Nope=[QMessageBox.NoRole, lambda: None],  # here is cos
             )
             return
         setting()
@@ -812,16 +836,19 @@ class SecondTab(MyTab):
         # self.movie.stop()
         # self.set_status(True)
         Worker.stash -= 1
-        print(Worker.stash, "hejgo", Worker.stash == 0)
-        if Worker.stash == 0:
-            print("stopujeeee")
+        if Worker.stash == 0 and Worker2.stash==0:
+            self.movie.stop()
+            self.load_label.setVisible(False)
+    def finished_download_tofile(self):
+        Worker2.stash-=1
+        if Worker.stash == 0 and Worker2.stash==0:
             self.movie.stop()
             self.load_label.setVisible(False)
 
     def download_normal_command(self):
         def adding_new_song():
             Worker.stash += 1
-            if Worker.stash == 1:
+            if Worker.stash == 1 and Worker2.stash==0:
                 self.movie.start()
             self.worker = Worker(
                 self.entries_list["entry_title"].getText(),
@@ -848,7 +875,7 @@ class SecondTab(MyTab):
         )
 
     def download_to_file(self):
-        self.set_status(False)
+        # self.set_status(False)
         with open(
             f"{Path(__main__.__file__).parent.__str__()}/json_files/data_spotify_window.json"
         ) as file:
@@ -908,8 +935,15 @@ class SecondTab(MyTab):
                     directory_name=None,
                     file_name=namefile,
                 )
+            Worker2.stash+=1
+            if Worker.stash == 0 and Worker2.stash==1:
+                self.movie.start()
+                self.load_label.setVisible(True)
             self.worker.start()
             self.worker.progress.connect(self.worker.run)
+            self.worker.finish.connect(
+                self.finished_download_tofile
+            )
 
         MyMsgBox(
             **data["msgbox_directory"],
@@ -924,6 +958,7 @@ class SecondTab(MyTab):
         self.download_panel.set_status(status)
         self.filterlist.set_status(status)
         self.entries_list.set_status(status)
+
     def clear(self):
         # self.filterlist.scroll.setVisible(False)
         self.set_spotify(True)

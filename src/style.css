@@ -21,6 +21,10 @@ QPushButton#see_password:hover {
     background-color: rgb(101, 237, 247);
     border: 0px;
 } */
+QWidget{
+    background-color: rgb(101, 237, 247);
+    border: 0px solid ;
+}
 QTabWidget::pane {
     background-color: rgb(101, 237, 247);
     border: 1px;
