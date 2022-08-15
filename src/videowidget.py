@@ -242,7 +242,6 @@ class CustomVideoPlayer:
     def stopfunction(self, name):
         if self.video_name:
             if name == self.video_name.split("/")[-1]:
-                print("zrob sie")
                 self.set_spotife_title()
 
     def autoplay_function(self):
@@ -612,8 +611,6 @@ class CustomVideoPlayer:
             )
 
     def open_movie(self, name, play=True):
-        print(name, play)
-        print(self.mediaPlayer.state())
         if name:
             if self.videoWidget.isHidden():
                 self.set_spotife_title(False)
@@ -700,7 +697,7 @@ class CustomVideoPlayer:
             **data,
             Yeah=[
                 QMessageBox.YesRole,
-                lambda: self.exit_func(next_window, next_window=True),
+                lambda: self.exit_func(next_window, next_window=next_window),
             ],
             Nope=[QMessageBox.NoRole, lambda: None],
         )

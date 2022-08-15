@@ -41,6 +41,7 @@ class GlobalKeys:
         self.LOCAL_KEYS = True
         self.GLOBAL_KEYS = False
         self.on = list()
+        self.master = customvideoplayer.window
         self.tab = customvideoplayer.tab
         self.videoplayer = customvideoplayer
         self.creating_global_shortcuts()
@@ -189,7 +190,7 @@ class GlobalKeys:
             if not self.GLOBAL_KEYS and self.LOCAL_KEYS
             else None
         )
-        shortcut = QShortcut(QKeySequence(Qt.Key_Escape), self.tab)
+        shortcut = QShortcut(QKeySequence(Qt.Key_Escape), self.master)
         shortcut.activated.connect(
             lambda: self.videoplayer.func_for_exit(data, next_window=True)
             if not self.GLOBAL_KEYS
